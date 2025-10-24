@@ -1,0 +1,91 @@
+version: '3.9'
+
+services:
+  # Main API Backend
+  evol.api:
+    container_name: evol.api
+    build:
+      context: ./src/eVOL.Api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - evol.mysql
+      - evol.redis
+      - evol.mongodb
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+  # Blazor WebAssembly Client
+  evol.client:
+    container_name: evol.client
+    build:
+      context: ./src/eVOL.Client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - evol.api
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+  # MySQL Database
+  evol.mysql:
+    container_name: evol.mysql
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: evol_db
+      MYSQL_USER: evol_user
+      MYSQL_PASSWORD: evol_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - evol-mysql-data:/var/lib/mysql
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+  # MongoDB Database
+  evol.mongodb:
+    container_name: evol.mongodb
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: evol_user
+      MONGO_INITDB_ROOT_PASSWORD: evol_password
+      MONGO_INITDB_DATABASE: evol_chat_db
+    ports:
+      - "27018:27017"
+    volumes:
+      - evol-mongodb-data:/data/db
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+  # Redis Cache
+  evol.redis:
+    container_name: evol.redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - evol-redis-data:/data
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+# Persistent Volumes
+volumes:
+  evol-mysql-data:
+  evol-mongodb-data:
+  evol-redis-data:
+
+# Shared Network
+networks:
+  evol-network:
+    driver: bridge
