@@ -19,20 +19,6 @@ services:
       - evol-network
     restart: unless-stopped
 
-  # Blazor WebAssembly Client
-  evol.client:
-    container_name: evol.client
-    build:
-      context: ./src/eVOL.Client
-      dockerfile: Dockerfile
-    ports:
-      - "5173:80"
-    depends_on:
-      - evol.api
-    networks:
-      - evol-network
-    restart: unless-stopped
-
   # MySQL Database
   evol.mysql:
     container_name: evol.mysql

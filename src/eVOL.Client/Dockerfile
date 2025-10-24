@@ -1,16 +1,30 @@
-# Stage 1: Build the Blazor WebAssembly app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
+EXPOSE 8082
+EXPOSE 8083
 
-# Copy everything and restore
-COPY . ./
-RUN dotnet restore
-RUN dotnet publish -c Release -o /out
 
-# Stage 2: Serve with Nginx
-FROM nginx:alpine
-COPY --from=build /out/wwwroot /usr/share/nginx/html
+# This stage is used to build the service project
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["eVOL.Client.csproj", "."]
+RUN dotnet restore "./eVOL.Client.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "./eVOL.Client.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Expose port 80 for the web app
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# This stage is used to publish the service project to be copied to the final stage
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./eVOL.Client.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "eVOL.Client.dll"]
