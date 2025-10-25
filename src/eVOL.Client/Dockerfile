@@ -4,18 +4,18 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8082
-EXPOSE 8083
+EXPOSE 8080
+EXPOSE 8081
 
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["eVOL.Client.csproj", "."]
-RUN dotnet restore "./eVOL.Client.csproj"
+COPY ["src/eVOL.Client/eVOL.Client.csproj", "src/eVOL.Client/"]
+RUN dotnet restore "./src/eVOL.Client/eVOL.Client.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/src/eVOL.Client"
 RUN dotnet build "./eVOL.Client.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

@@ -1,7 +1,6 @@
 version: '3.9'
 
 services:
-  # Main API Backend
   evol.api:
     container_name: evol.api
     build:
@@ -19,7 +18,22 @@ services:
       - evol-network
     restart: unless-stopped
 
-  # MySQL Database
+  evol.client:
+    container_name: evol.client
+    build:
+      context: ./src/eVOL.Client  
+      dockerfile: Dockerfile  
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - evol.api
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+
   evol.mysql:
     container_name: evol.mysql
     image: mysql:8.0
@@ -37,7 +51,6 @@ services:
       - evol-network
     restart: unless-stopped
 
-  # MongoDB Database
   evol.mongodb:
     container_name: evol.mongodb
     image: mongo:6
@@ -53,7 +66,6 @@ services:
       - evol-network
     restart: unless-stopped
 
-  # Redis Cache
   evol.redis:
     container_name: evol.redis
     image: redis:7-alpine
@@ -65,7 +77,6 @@ services:
       - evol-network
     restart: unless-stopped
 
-# Persistent Volumes
 volumes:
   evol-mysql-data:
   evol-mongodb-data:
