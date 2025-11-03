@@ -28,6 +28,7 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 | Caching           | Redis                                                    |
 | Security          | JWT Tokens, AES Encryption, BCrypt Hashing              |
 | Real-time         | SignalR                                                  |
+| Message Brokler   | RabbitMQ                                |
 | Load Balancing    | NGINX (reverse proxy for multiple API instances)        |
 | Containerization  | Docker, Docker Compose                                   |
 | CI/CD             | GitHub Actions Pipeline                                  |
@@ -37,8 +38,9 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 ## 🏗 Project Architecture
 
 - **Frontend:** Blazor WebAssembly application  
-- **Backend:** 3 API servers (`evol.api1`, `evol.api2`, `evol.api3`) running behind **NGINX** for load balancing  
+- **Backend:** Api server using **NGINX** for load balancing  
 - **Databases:** MySQL for users, MongoDB for chat messages, Redis for caching  
+- **Real Time Communication:** SignalR & RabbitMQ for latest and modern messaging
 - **Reverse Proxy:** NGINX manages incoming requests and distributes them across multiple API instances  
 - **Docker Compose:** Orchestrates all services, networking, and volumes for persistent storage  
 
