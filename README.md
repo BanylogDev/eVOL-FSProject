@@ -13,17 +13,34 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 - **User profiles in MySQL**
 - **Chat messages in MongoDB**
 - Future-ready: RabbitMQ support for messaging queue
+- **Scalable API layer** with multiple instances behind **NGINX load balancer**
+- **Containerized services** managed with **Docker Compose**
 
 ---
 
 ## 🛠 Technologies
 
-| Layer | Technology |
-|-------|------------|
-| Backend | .NET 8, ASP.NET Core Web API, Clean Architecture |
-| Frontend | Blazor WebAssembly |
-| Database | MySQL (users), MongoDB (chat messages) |
-| Caching | Redis |
-| Security | JWT Tokens, AES Encryption, BCrypt Hashing |
-| Real-time | SignalR |
-| CI/CD | GitHub Actions Pipeline |
+| Layer            | Technology                                               |
+|------------------|----------------------------------------------------------|
+| Backend           | .NET 8, ASP.NET Core Web API, Clean Architecture        |
+| Frontend          | Blazor WebAssembly                                       |
+| Database          | MySQL (users), MongoDB (chat messages)                  |
+| Caching           | Redis                                                    |
+| Security          | JWT Tokens, AES Encryption, BCrypt Hashing              |
+| Real-time         | SignalR                                                  |
+| Load Balancing    | NGINX (reverse proxy for multiple API instances)        |
+| Containerization  | Docker, Docker Compose                                   |
+| CI/CD             | GitHub Actions Pipeline                                  |
+
+---
+
+## 🏗 Project Architecture
+
+- **Frontend:** Blazor WebAssembly application  
+- **Backend:** 3 API servers (`evol.api1`, `evol.api2`, `evol.api3`) running behind **NGINX** for load balancing  
+- **Databases:** MySQL for users, MongoDB for chat messages, Redis for caching  
+- **Reverse Proxy:** NGINX manages incoming requests and distributes them across multiple API instances  
+- **Docker Compose:** Orchestrates all services, networking, and volumes for persistent storage  
+
+---
+

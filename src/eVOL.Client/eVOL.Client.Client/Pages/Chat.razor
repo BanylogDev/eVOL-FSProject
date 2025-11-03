@@ -1,0 +1,158 @@
+﻿@page "/chat"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+
+<h3 class="chat-title">💬 Chat Room</h3>
+
+<div class="chat-container">
+    <div class="chat-messages">
+        @foreach (var msg in messages)
+        {
+            <div class="chat-message @(msg.isSelf ? "self" : "other")">
+                <span class="user">@msg.user:</span>
+                <span class="text">@msg.text</span>
+            </div>
+        }
+    </div>
+
+    <div class="chat-input">
+        <input @bind="messageInput" @bind:event="oninput" placeholder="Type a message..." @onkeypress="HandleKeyPress" />
+        <button @onclick="SendMessage">Send</button>
+    </div>
+</div>
+
+@code {
+    private HubConnection? _hubConnection;
+    private string messageInput = string.Empty;
+    private string username = $"User{Random.Shared.Next(100, 999)}";
+    private List<(string user, string text, bool isSelf)> messages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Dynamic URL that works in both local dev and Docker/Nginx
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:8080/chat-hub")
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            messages.Add((user, message, user == username));
+            InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await _hubConnection.StartAsync();
+            messages.Add(("System", $"Connected as {username}", false));
+        }
+        catch (Exception ex)
+        {
+            messages.Add(("Error", $"Could not connect: {ex.Message}", false));
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(messageInput))
+        {
+            await _hubConnection!.SendAsync("SendMessage", username, messageInput);
+            messageInput = string.Empty;
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await SendMessage();
+    }
+}
+
+<style>
+    .chat-title {
+        font-size: 24px;
+        color: var(--accent-blue, #0eb7ff);
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        width: 600px;
+        max-width: 90vw;
+        height: 70vh;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 215, 0, 0.05);
+        border-radius: 12px;
+        padding: 16px;
+        backdrop-filter: blur(6px);
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 4px;
+        margin-bottom: 10px;
+    }
+
+    .chat-message {
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.4;
+        max-width: 75%;
+        word-wrap: break-word;
+    }
+
+        .chat-message.self {
+            align-self: flex-end;
+            background: rgba(14,183,255,0.1);
+            border: 1px solid rgba(14,183,255,0.2);
+        }
+
+        .chat-message.other {
+            align-self: flex-start;
+            background: rgba(255,215,0,0.08);
+            border: 1px solid rgba(255,215,0,0.15);
+        }
+
+    .user {
+        font-weight: 600;
+        color: var(--accent-gold, #ffd700);
+        margin-right: 6px;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 8px;
+    }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.1);
+            background: rgba(0,0,0,0.4);
+            color: white;
+        }
+
+        .chat-input button {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 600;
+            background: linear-gradient(90deg, rgba(14,183,255,0.4), rgba(14,183,255,0.2));
+            transition: 0.2s ease;
+        }
+
+            .chat-input button:hover {
+                background: rgba(14,183,255,0.6);
+            }
+</style>

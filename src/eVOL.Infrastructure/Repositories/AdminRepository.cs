@@ -20,14 +20,7 @@ namespace eVOL.Infrastructure.Repositories
 
         public async Task<User?> GetUserInfoAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return null;
-            }
-
-            return user;
+            return await _context.Users.FindAsync(id);
         }
     }
 }

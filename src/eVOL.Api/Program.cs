@@ -1,18 +1,19 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using eVOL.Infrastructure.Data;
-using System;
-using System.Text;
-using StackExchange.Redis;
+using eVOL.API.Hubs;
 using eVOL.Application.ServicesInterfaces;
-using eVOL.Infrastructure.Services;
-using eVOL.Application.UseCases.UCInterfaces.IAdminCases;
 using eVOL.Application.UseCases.AdminCases;
+using eVOL.Application.UseCases.UCInterfaces.IAdminCases;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Application.UseCases.UserCases;
 using eVOL.Domain.RepositoriesInteraces;
+using eVOL.Infrastructure.Data;
 using eVOL.Infrastructure.Repositories;
+using eVOL.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
+using System;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +66,7 @@ IssuerSigningKey = new SymmetricSecurityKey(
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
 {
     Title = "Zelta",
     Version = "v1"
@@ -94,6 +95,24 @@ options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequi
             },
             new string[] {}
         }
+    });
+});
+
+var redisConnection = builder.Configuration["CacheSettings:RedisConnection"];
+builder.Services.AddSignalR().AddStackExchangeRedis(redisConnection, opts =>
+{
+    opts.Configuration.ChannelPrefix = "evol.signalr";
+});
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyMethod() // Allow POST, GET, etc.
+              .AllowAnyHeader()  // Allow necessary headers
+              .WithOrigins("http://localhost:5001") // <-- IMPORTANT: Replace with your Blazor app's URL
+              .AllowCredentials(); // Crucial for SignalR authentication
     });
 });
 
@@ -133,10 +152,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseRouting();
 
+// --- 3. Use CORS and SignalR Middleware ---
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Map endpoints
 app.MapControllers();
+app.MapHub<ChatHub>("/chat-hub");
 
 app.Run();

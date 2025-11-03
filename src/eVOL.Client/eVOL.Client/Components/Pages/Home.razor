@@ -1,0 +1,158 @@
+﻿@page "/"
+@layout Layout.NavMenu
+
+<div class="center-stage">
+    <div class="home-panel card">
+        <h1 class="main-title">Advanced Chat Application</h1>
+
+        <div class="features-grid">
+            <div class="feature-box">
+                <h3>Features</h3>
+                <ul class="feature-list">
+                    <li>Real-time messaging with presence</li>
+                    <li>Direct and group conversations</li>
+                    <li>Message encryption and attachments</li>
+                    <li>User profiles and presence indicators</li>
+                    <li>Typing indicators, read receipts, and message reactions</li>
+                </ul>
+            </div>
+
+            <div class="feature-box">
+                <h3>Technologies</h3>
+                <ul class="tech-list">
+                    <li><strong>C#</strong></li>
+                    <li><strong>.NET 8 / Blazor</strong></li>
+                    <li><strong>SignalR</strong> real-time</li>
+                    <li><strong>MySQL</strong> (users)</li>
+                    <li><strong>MongoDB</strong> (messages)</li>
+                    <li><strong>Redis</strong> caching</li>
+                    <li><strong>JWT / AES / BCrypt</strong> security</li>
+                </ul>
+            </div>
+
+            <div class="feature-box">
+                <h3>Quick Notes</h3>
+                <p class="muted">This project is a modern, extensible chat platform built to support high-throughput messaging, multi-database storage, and secure authentication.</p>
+            </div>
+        </div>
+
+        <div class="cta-row">
+            <a class="btn primary" href="/login">Login</a>
+            <a class="btn ghost" href="/register">Register</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .main-title {
+        color: #ffd700;
+        margin: 0 0 14px 0;
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 0.6px;
+    }
+
+    .center-stage {
+        width: 100%;
+        max-width: 1100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border: 1px solid rgba(255,215,0,0.06);
+        border-radius: 14px;
+        padding: 28px;
+        box-shadow: 0 18px 50px rgba(0,0,0,0.75);
+        color: #d6d6d6;
+        min-width: 320px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+
+    .feature-box {
+        background: rgba(255,255,255,0.02);
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid rgba(14,183,255,0.05);
+    }
+
+        .feature-box h3 {
+            color: #ffcf33;
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }
+
+    .feature-list, .tech-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .feature-list li, .tech-list li {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+    .muted {
+        color: #cfcfcf;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .cta-row {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 12px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+        .btn.primary {
+            background: linear-gradient(90deg, #ffd700, #ffcf33);
+            color: #0b0b0b;
+            border: 1px solid rgba(255,215,0,0.12);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: #d6d6d6;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+    @@media (max-width:520px) {
+        .card {
+            width: 92%;
+            padding: 18px;
+        }
+
+        .main-title {
+            font-size: 20px;
+        }
+
+        .features-grid {
+            gap: 12px;
+        }
+    }
+</style>

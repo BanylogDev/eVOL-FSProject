@@ -1,13 +1,32 @@
 version: '3.9'
 
 services:
-  evol.api:
-    container_name: evol.api
+  # NGINX load balancer / reverse proxy
+  nginx:
+    container_name: nginx-lb
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"       # HTTP
+      # - "443:443"   # uncomment if you add SSL certs and configure TLS
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - evol.api1
+      - evol.api2
+      - evol.api3
+      - evol.client
+    networks:
+      - evol-network
+    restart: unless-stopped
+
+  # Backend API instance 1
+  evol.api1:
+    container_name: evol.api1
     build:
       context: ./src/eVOL.Api
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
     env_file:
       - .env
     depends_on:
@@ -16,23 +35,74 @@ services:
       - evol.mongodb
     networks:
       - evol-network
+    expose:
+      - "8080"
+    environment:
+      - DOTNET_URLS=http://0.0.0.0:8080
     restart: unless-stopped
+    # Recommended: don't map host ports for multiple replicas.
+    # If you need to expose them on host for debugging, uncomment a different host port:
+
+  # Backend API instance 2
+  evol.api2:
+    container_name: evol.api2
+    build:
+      context: ./src/eVOL.Api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - evol.mysql
+      - evol.redis
+      - evol.mongodb
+    networks:
+      - evol-network
+    expose:
+      - "8080"
+    environment:
+      - DOTNET_URLS=http://0.0.0.0:8080
+    restart: unless-stopped
+    # ports:
+    #   - "8082:8080"
+
+  # Backend API instance 3
+  evol.api3:
+    container_name: evol.api3
+    build:
+      context: ./src/eVOL.Api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - evol.mysql
+      - evol.redis
+      - evol.mongodb
+    networks:
+      - evol-network
+    expose:
+      - "8080"
+    environment:
+      - DOTNET_URLS=http://0.0.0.0:8080
+    restart: unless-stopped
+    # ports:
+    #   - "8083:8080"
 
   evol.client:
     container_name: evol.client
     build:
-      context: ./src/eVOL.Client  
-      dockerfile: Dockerfile  
+      context: ./src/eVOL.Client
+      dockerfile: Dockerfile
     ports:
       - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - evol.api
+      - evol.api1
+      - evol.api2
+      - evol.api3
     networks:
       - evol-network
     restart: unless-stopped
-
 
   evol.mysql:
     container_name: evol.mysql
@@ -82,7 +152,6 @@ volumes:
   evol-mongodb-data:
   evol-redis-data:
 
-# Shared Network
 networks:
   evol-network:
     driver: bridge
