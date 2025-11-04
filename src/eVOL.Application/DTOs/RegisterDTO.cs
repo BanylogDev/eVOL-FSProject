@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eVOL.Domain.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,13 +12,21 @@ namespace eVOL.Application.DTOs
     {
         [Required]
         [StringLength(12, MinimumLength = 4)]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; }
         [Required]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; }
         [Required]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string Country { get; set; }
+        [Required]
+        public string City { get; set; }
+        [Required]
+        public string AddressName { get; set; }
+        [Required]
+        public string AddressNumber { get; set; }
+        [Required]
+        public string PhoneNumber { get; set; }
     }
 }

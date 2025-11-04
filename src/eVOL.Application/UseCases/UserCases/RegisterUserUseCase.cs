@@ -3,6 +3,7 @@ using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
+using eVOL.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -35,11 +36,20 @@ namespace eVOL.Application.UseCases.UserCases
 
             var hashedPassword = _passwordHasher.HashPassword(dto.Password);
 
+            var newAddress = new Address
+            (
+                dto.Country,
+                dto.City,
+                dto.AddressName,
+                dto.AddressNumber
+            );
+
             var newUser = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
                 Password = hashedPassword,
+                Address = newAddress,
                 Role = "User",
                 CreatedAt = DateTime.UtcNow,
             };
