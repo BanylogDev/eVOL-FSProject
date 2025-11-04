@@ -27,6 +27,10 @@ namespace eVOL.Application.DTOs
         [Required]
         public string AddressNumber { get; set; }
         [Required]
+        public double Balance { get; set; }
+        [Required]
+        public string Currency { get; set; }
+        [Required]
         public string PhoneNumber { get; set; }
     }
 }

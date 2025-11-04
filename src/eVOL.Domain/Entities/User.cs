@@ -21,6 +21,7 @@ namespace eVOL.Domain.Entities
         public string Password { get; set; } = string.Empty;
         public Address? Address { get; set; }
         public string Role { get; set; } = "User";
+        public Money? Money { get; set; }
         public DateTime CreatedAt { get; set; }
 
 

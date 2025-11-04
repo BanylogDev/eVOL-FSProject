@@ -44,6 +44,11 @@ namespace eVOL.Application.UseCases.UserCases
                 dto.AddressNumber
             );
 
+            var newMoney = new Money(
+                dto.Balance,
+                dto.Currency);
+            
+
             var newUser = new User
             {
                 Name = dto.Name,
@@ -51,6 +56,7 @@ namespace eVOL.Application.UseCases.UserCases
                 Password = hashedPassword,
                 Address = newAddress,
                 Role = "User",
+                Money = newMoney,
                 CreatedAt = DateTime.UtcNow,
             };
 
