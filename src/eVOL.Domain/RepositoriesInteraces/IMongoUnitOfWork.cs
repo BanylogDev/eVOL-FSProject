@@ -8,7 +8,7 @@ namespace eVOL.Domain.RepositoriesInteraces
 {
     public interface IMongoUnitOfWork
     {
-        Task BeginTransactionAsync();
+        void BeginTransactionAsync();
         Task CommitAsync();
         Task RollbackAsync();
     }
