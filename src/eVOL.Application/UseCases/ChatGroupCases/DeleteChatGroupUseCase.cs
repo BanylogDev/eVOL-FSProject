@@ -11,23 +11,38 @@ namespace eVOL.Application.UseCases.ChatGroupCases
 {
     public class DeleteChatGroupUseCase
     {
-        private readonly IChatGroupRepository _chatGroupRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public DeleteChatGroupUseCase(IChatGroupRepository chatGroupRepo)
+        public DeleteChatGroupUseCase(IMySqlUnitOfWork uow)
         {
-            _chatGroupRepo = chatGroupRepo;
+            _uow = uow;
         }
 
         public async Task<ChatGroup?> ExecuteAsync(int id)
         {
-            var chatGroup = await _chatGroupRepo.GetChatGroupById(id);
 
-            if (chatGroup == null)
+            await _uow.BeginTransactionAsync();
+
+            try
             {
-                return null;
+                var chatGroup = await _uow.ChatGroup.GetChatGroupById(id);
+
+                if (chatGroup == null)
+                {
+                    return null;
+                }
+
+                await _uow.ChatGroup.CreateChatGroup(chatGroup);
+                await _uow.CommitAsync();
+
+                return chatGroup;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
             }
 
-            return await _chatGroupRepo.CreateChatGroup(chatGroup);
         }
     }
 }

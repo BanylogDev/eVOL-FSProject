@@ -11,25 +11,41 @@ namespace eVOL.Application.UseCases.ChatGroupCases
 {
     public class CreateChatGroupUseCase
     {
-        private readonly IChatGroupRepository _chatGroupRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public CreateChatGroupUseCase(IChatGroupRepository chatGroupRepo)
+        public CreateChatGroupUseCase(IMySqlUnitOfWork uow)
         {
-            _chatGroupRepo = chatGroupRepo;
+            _uow = uow;
         }
 
         public async Task<ChatGroup> ExecuteAsync(ChatGroupDTO dto)
         {
-            var chatGroup = new ChatGroup
-            {
-                Name = dto.Name,
-                TotalUsers = dto.TotalUsers,
-                GroupUsers = dto.GroupUsers,
-                OwnerId = dto.OwnerId,
-                CreatedAt = DateTime.UtcNow,
-            };
 
-            return await _chatGroupRepo.CreateChatGroup(chatGroup);
+            await _uow.BeginTransactionAsync();
+
+            try
+            {
+
+                var chatGroup = new ChatGroup
+                {
+                    Name = dto.Name,
+                    TotalUsers = dto.TotalUsers,
+                    GroupUsers = dto.GroupUsers,
+                    OwnerId = dto.OwnerId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                await _uow.ChatGroup.CreateChatGroup(chatGroup);
+                await _uow.CommitAsync();
+                
+                return chatGroup;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;  
+            }
+
         }
     }
 }

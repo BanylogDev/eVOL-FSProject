@@ -10,16 +10,16 @@ namespace eVOL.Application.UseCases.ChatGroupCases
 {
     public class GetChatGroupByIdUseCase
     {
-        private readonly IChatGroupRepository _chatGroupRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public GetChatGroupByIdUseCase(IChatGroupRepository chatGroupRepo)
+        public GetChatGroupByIdUseCase(IMySqlUnitOfWork uow)
         {
-            _chatGroupRepo = chatGroupRepo;
+            _uow = uow;
         }
 
         public async Task<ChatGroup?> ExecuteAsync(int id)
         {
-            return await _chatGroupRepo.GetChatGroupById(id);
+            return await _uow.ChatGroup.GetChatGroupById(id);
         }
     }
 }

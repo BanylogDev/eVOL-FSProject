@@ -13,30 +13,42 @@ namespace eVOL.Application.UseCases.UserCases
 {
     public class DeleteUserUseCase : IDeleteUserUseCase
     {
-        private readonly IUserRepository _userRepo;
+        private readonly IMySqlUnitOfWork _uow;
         private readonly IPasswordHasher _passwordHasher;
 
-        public DeleteUserUseCase(IUserRepository userRepo, IPasswordHasher passwordHasher)
+        public DeleteUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher)
         {
-            _userRepo = userRepo;
+            _uow = uow;
             _passwordHasher = passwordHasher;
         }
 
         public async Task<User?> ExecuteAsync(DeleteAccountDTO dto)
         {
-            var user = await _userRepo.GetUserById(dto.Id);
 
-            if (user == null || 
-                dto.Password != dto.ConfirmPassword ||
-               _passwordHasher.VerifyPassword(dto.Password, _passwordHasher.HashPassword(dto.Password)))
+            await _uow.BeginTransactionAsync();
+
+            try
             {
-                return null;
+                var user = await _uow.Users.GetUserById(dto.Id);
+
+                if (user == null ||
+                    dto.Password != dto.ConfirmPassword ||
+                   _passwordHasher.VerifyPassword(dto.Password, _passwordHasher.HashPassword(dto.Password)))
+                {
+                    return null;
+                }
+
+                _uow.Users.RemoveUser(user);
+                await _uow.CommitAsync();
+
+                return user;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
             }
 
-            _userRepo.RemoveUser(user);
-            await _userRepo.SaveChangesAsync();
-
-            return user;
         }
 
 

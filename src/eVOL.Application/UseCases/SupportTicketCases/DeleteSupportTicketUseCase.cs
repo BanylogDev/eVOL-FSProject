@@ -10,23 +10,38 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 {
     public class DeleteSupportTicketUseCase
     {
-        private readonly ISupportTicketRepository _supportTicketRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public DeleteSupportTicketUseCase(ISupportTicketRepository supportTicketRepo)
+        public DeleteSupportTicketUseCase(IMySqlUnitOfWork uow)
         {
-            _supportTicketRepo = supportTicketRepo;
+            _uow = uow;
         }
 
         public async Task<SupportTicket?> ExecuteAsync(int id)
         {
-            var supportTicket = await _supportTicketRepo.GetSupportTicketById(id);
 
-            if (supportTicket == null)
+            await _uow.BeginTransactionAsync(); 
+
+            try
             {
-                return null;
+                var supportTicket = await _uow.SupportTicket.GetSupportTicketById(id);
+
+                if (supportTicket == null)
+                {
+                    return null;
+                }
+
+                await _uow.SupportTicket.DeleteSupportTicket(supportTicket);
+                await _uow.CommitAsync();
+
+                return supportTicket;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
             }
 
-            return await _supportTicketRepo.DeleteSupportTicket(supportTicket);
         }
     }
 }

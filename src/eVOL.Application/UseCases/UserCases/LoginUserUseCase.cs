@@ -14,15 +14,15 @@ namespace eVOL.Application.UseCases.UserCases
 {
     public class LoginUserUseCase : ILoginUserUseCase
     {
-        private readonly IAuthRepository _authRepo;
+        private readonly IMySqlUnitOfWork _uow;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _config;
 
         
-        public LoginUserUseCase(IAuthRepository authRepo, IPasswordHasher passwordHasher, IJwtService jwtService, IConfiguration config)
+        public LoginUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, IJwtService jwtService, IConfiguration config)
         {
-            _authRepo = authRepo;
+            _uow = uow;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
             _config = config;
@@ -30,23 +30,35 @@ namespace eVOL.Application.UseCases.UserCases
 
         public async Task<User?> ExecuteAsync(LoginDTO dto)
         {
-            var user = await _authRepo.GetUserByEmail(dto.Email);
 
-            if (user == null || !_passwordHasher.VerifyPassword(dto.Password, user.Password))
+            await _uow.BeginTransactionAsync();
+
+            try
             {
-                return null;
+                var user = await _uow.Auth.GetUserByEmail(dto.Email);
+
+                if (user == null || !_passwordHasher.VerifyPassword(dto.Password, user.Password))
+                {
+                    return null;
+                }
+
+                var token = _jwtService.GenerateJwtToken(user, _config);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+
+                user.RefreshToken = refreshToken;
+                user.AccessToken = token;
+                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1);
+
+                await _uow.CommitAsync();
+
+                return user;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
             }
 
-            var token = _jwtService.GenerateJwtToken(user, _config);
-            var refreshToken = _jwtService.GenerateRefreshToken();
-
-            user.RefreshToken = refreshToken;
-            user.AccessToken = token;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1);
-
-            await _authRepo.SaveChangesAsync();
-
-            return user;
         } 
     }
 }

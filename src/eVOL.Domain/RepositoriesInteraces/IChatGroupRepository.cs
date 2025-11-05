@@ -13,6 +13,5 @@ namespace eVOL.Domain.RepositoriesInteraces
         Task<ChatGroup?> DeleteChatGroup(ChatGroup chatGroup);
         Task<ChatGroup?> GetChatGroupById(int chatGroupId);
         Task<ChatGroup?> GetChatGroupByName(string chatGroupName);
-        Task SaveChangesAsync();
     }
 }

@@ -56,11 +56,6 @@ namespace eVOL.Infrastructure.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public void RemoveUser(User user)
         {
             _context.Remove(user);

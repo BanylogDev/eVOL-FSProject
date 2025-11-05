@@ -11,16 +11,16 @@ namespace eVOL.Application.UseCases.AdminCases
 {
     public class AdminGetUserUseCase : IAdminGetUserUseCase
     {
-        private readonly IUserRepository _userRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public AdminGetUserUseCase(IUserRepository userRepo)
+        public AdminGetUserUseCase(IMySqlUnitOfWork uow)
         {
-            _userRepo = userRepo;
+            _uow = uow;
         }
 
         public async Task<User?> ExecuteAsync(int id)
         {
-            return await _userRepo.GetUserById(id);
+            return await _uow.Users.GetUserById(id);
         }
     }
 }

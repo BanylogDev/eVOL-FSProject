@@ -10,16 +10,16 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 {
     public class GetSupportTicketByIdUseCase
     {
-        private readonly ISupportTicketRepository _supportTicketRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public GetSupportTicketByIdUseCase(ISupportTicketRepository supportTicketRepo)
+        public GetSupportTicketByIdUseCase(IMySqlUnitOfWork uow)
         {
-            _supportTicketRepo = supportTicketRepo;
+            _uow = uow;
         }
 
         public async Task<SupportTicket?> ExecuteAsync(int id)
         {
-            return await _supportTicketRepo.GetSupportTicketById(id);
+            return await _uow.SupportTicket.GetSupportTicketById(id);
         }
     }
 }

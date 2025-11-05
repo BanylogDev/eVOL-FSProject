@@ -13,28 +13,39 @@ namespace eVOL.Application.UseCases.AdminCases
 {
     public class AdminDeleteUserUseCase : IAdminDeleteUserUseCase
     {
-        private readonly IUserRepository _userRepo;
+        private readonly IMySqlUnitOfWork _uow;
         private readonly IPasswordHasher _passwordHasher;
 
-        public AdminDeleteUserUseCase(IUserRepository userRepo, IPasswordHasher passwordHasher)
+        public AdminDeleteUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher)
         {
-            _userRepo = userRepo;
+            _uow = uow;
             _passwordHasher = passwordHasher;
         }
 
         public async Task<User?> ExecuteAsync(int id)
         {
-            var user = await _userRepo.GetUserById(id);
 
-            if (user == null)
+            await _uow.BeginTransactionAsync();
+
+            try
             {
-                return null;
+                var user = await _uow.Users.GetUserById(id);
+
+                if (user == null)
+                {
+                    return null;
+                }
+
+                _uow.Users.RemoveUser(user);
+                await _uow.CommitAsync();
+
+                return user;
             }
-
-            _userRepo.RemoveUser(user);
-            await _userRepo.SaveChangesAsync();
-
-            return user;
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
         }
     }
 }

@@ -22,7 +22,6 @@ namespace eVOL.Infrastructure.Repositories
         public async Task<ChatGroup> CreateChatGroup(ChatGroup chatGroup)
         {
             await _context.ChatGroups.AddAsync(chatGroup);
-            await _context.SaveChangesAsync();
 
             return chatGroup;
         }
@@ -31,7 +30,6 @@ namespace eVOL.Infrastructure.Repositories
         {
 
             _context.ChatGroups.Remove(chatGroup);
-            await _context.SaveChangesAsync();
 
             return chatGroup;
         }
@@ -44,11 +42,6 @@ namespace eVOL.Infrastructure.Repositories
         public async Task<ChatGroup?> GetChatGroupByName(string chatGroupName)
         {
             return await _context.ChatGroups.FirstOrDefaultAsync(c => c.Name == chatGroupName);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
 
     }

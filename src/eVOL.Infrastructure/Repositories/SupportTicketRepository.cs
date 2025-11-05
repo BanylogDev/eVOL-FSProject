@@ -23,7 +23,6 @@ namespace eVOL.Infrastructure.Repositories
         {
 
             await _context.SupportTickets.AddAsync(supportTicket);
-            await _context.SaveChangesAsync();
 
             return supportTicket;
         }
@@ -32,7 +31,6 @@ namespace eVOL.Infrastructure.Repositories
         {
 
             _context.SupportTickets.Remove(supportTicket);
-            await _context.SaveChangesAsync();
 
             return supportTicket;
         } 
@@ -40,11 +38,6 @@ namespace eVOL.Infrastructure.Repositories
         public async Task<SupportTicket?> GetSupportTicketById(int id)
         {
             return await _context.SupportTickets.FindAsync(id);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
     }
 }

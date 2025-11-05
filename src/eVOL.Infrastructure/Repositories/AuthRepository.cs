@@ -39,14 +39,8 @@ namespace eVOL.Infrastructure.Repositories
         {
             await _context.Users.AddAsync(newUser);
 
-            await _context.SaveChangesAsync();
-
             return newUser;
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
     }
 }

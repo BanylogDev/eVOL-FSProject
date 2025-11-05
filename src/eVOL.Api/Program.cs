@@ -6,6 +6,7 @@ using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Application.UseCases.UserCases;
 using eVOL.Domain.RepositoriesInteraces;
 using eVOL.Infrastructure.Data;
+using eVOL.Infrastructure.Persistence;
 using eVOL.Infrastructure.Repositories;
 using eVOL.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -141,7 +142,13 @@ builder.Services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IChatGroupRepository, ChatGroupRepository>();
+builder.Services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
 
+// Unit's Of Work
+
+builder.Services.AddScoped<IMySqlUnitOfWork, MySqlUnitOfWork>();
+builder.Services.AddScoped<IMongoUnitOfWork, MongoUnitOfWork>();
 
 var app = builder.Build();
 

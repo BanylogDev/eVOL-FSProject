@@ -10,32 +10,42 @@ namespace eVOL.Application.UseCases.ChatGroupCases
 {
     public class RemoveUserFromChatGroupUseCase
     {
-        private readonly IChatGroupRepository _chatGroupRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public RemoveUserFromChatGroupUseCase(IChatGroupRepository chatGroupRepo, IUserRepository userRepo)
+        public RemoveUserFromChatGroupUseCase(IMySqlUnitOfWork uow)
         {
-            _chatGroupRepo = chatGroupRepo;
-            _userRepo = userRepo;
+            _uow = uow;
         }
 
         public async Task<User?> ExecuteAsync(int userId, int chatGroupId)
         {
-            var user = await _userRepo.GetUserById(userId);
 
-            var chatGroup = await _chatGroupRepo.GetChatGroupById(chatGroupId);
+            await _uow.BeginTransactionAsync();
 
-            if (user == null || chatGroup == null || chatGroup.GroupUsers.Contains(user))
+            try
             {
-                return null;
+                var user = await _uow.Users.GetUserById(userId);
+
+                var chatGroup = await _uow.ChatGroup.GetChatGroupById(chatGroupId);
+
+                if (user == null || chatGroup == null || chatGroup.GroupUsers.Contains(user))
+                {
+                    return null;
+                }
+
+                chatGroup.GroupUsers.Remove(user);
+                chatGroup.TotalUsers -= 1;
+
+                await _uow.CommitAsync();
+
+                return user;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
             }
 
-            chatGroup.GroupUsers.Remove(user);
-            chatGroup.TotalUsers -= 1;
-
-            await _chatGroupRepo.SaveChangesAsync();
-
-            return user;
         }
     }
 }

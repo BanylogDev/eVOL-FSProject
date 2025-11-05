@@ -13,6 +13,5 @@ namespace eVOL.Domain.RepositoriesInteraces
         Task<User?> GetUserByName(string name);
         Task<User?> GetUserByEmail(string email);
         Task<User?> Register(User newUser);
-        Task SaveChangesAsync();
     }
 }

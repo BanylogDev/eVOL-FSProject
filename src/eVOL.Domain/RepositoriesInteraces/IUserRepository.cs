@@ -12,7 +12,6 @@ namespace eVOL.Domain.RepositoriesInteraces
         Task<User?> GetUserById(int id);
         Task<User?> GetUserByName(string email);
         Task<User?> GetUserByEmail(string email);
-        Task SaveChangesAsync();
         void RemoveUser(User user);
     }
 }

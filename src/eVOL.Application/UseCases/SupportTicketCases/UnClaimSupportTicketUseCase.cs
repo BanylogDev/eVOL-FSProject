@@ -11,32 +11,42 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 {
     public class UnClaimSupportTicketUseCase
     {
-        private readonly ISupportTicketRepository _supportTicketRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public UnClaimSupportTicketUseCase(ISupportTicketRepository supportTicketRepo, IUserRepository userRepo)
+        public UnClaimSupportTicketUseCase(IMySqlUnitOfWork uow)
         {
-            _supportTicketRepo = supportTicketRepo;
-            _userRepo = userRepo;
+            _uow = uow;
         }
 
         public async Task<User?> ExecuteAsync(ClaimSupportTicketDTO dto)
         {
-            var user = await _userRepo.GetUserById(dto.OpenedBy);
 
-            var supportTicket = await _supportTicketRepo.GetSupportTicketById(dto.Id);
+            await _uow.BeginTransactionAsync(); 
 
-            if (user == null || supportTicket == null || supportTicket.ClaimedStatus == false)
+            try
             {
-                return null;
+                var user = await _uow.Users.GetUserById(dto.OpenedBy);
+
+                var supportTicket = await _uow.SupportTicket.GetSupportTicketById(dto.Id);
+
+                if (user == null || supportTicket == null || supportTicket.ClaimedStatus == false)
+                {
+                    return null;
+                }
+
+                supportTicket.ClaimedBy = 0;
+                supportTicket.ClaimedStatus = false;
+
+                await _uow.CommitAsync();
+
+                return user;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
             }
 
-            supportTicket.ClaimedBy = 0;
-            supportTicket.ClaimedStatus = false;
-
-            await _supportTicketRepo.SaveChangesAsync();
-
-            return user;
         }
     }
 }

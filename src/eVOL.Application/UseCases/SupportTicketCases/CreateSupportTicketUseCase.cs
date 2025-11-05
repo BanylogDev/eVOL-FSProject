@@ -11,26 +11,41 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 {
     public class CreateSupportTicketUseCase
     {
-        private readonly ISupportTicketRepository _supportTicketRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public CreateSupportTicketUseCase(ISupportTicketRepository supportTicketRepo)
+        public CreateSupportTicketUseCase(IMySqlUnitOfWork uow)
         {
-            _supportTicketRepo = supportTicketRepo;
+            _uow = uow;
         }
 
         public async Task<SupportTicket> ExecuteAsync(SupportTicketDTO dto)
         {
-            var newSupportTicket = new SupportTicket()
+
+            await _uow.BeginTransactionAsync();
+
+            try
             {
-                Category = dto.Category,
-                Text = dto.Text,
-                OpenedBy = dto.OpenedBy,
-                ClaimedBy = 0,
-                CreatedAt = DateTime.UtcNow
+                var newSupportTicket = new SupportTicket()
+                {
+                    Category = dto.Category,
+                    Text = dto.Text,
+                    OpenedBy = dto.OpenedBy,
+                    ClaimedBy = 0,
+                    CreatedAt = DateTime.UtcNow
 
-            };
+                };
 
-            return await _supportTicketRepo.CreateSupportTicket(newSupportTicket);
+                await _uow.SupportTicket.CreateSupportTicket(newSupportTicket);
+                await _uow.CommitAsync();
+
+                return newSupportTicket;
+            }
+            catch
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
+
         }
     }
 }

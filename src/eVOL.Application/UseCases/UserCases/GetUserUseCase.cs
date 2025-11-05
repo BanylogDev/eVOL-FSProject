@@ -11,16 +11,16 @@ namespace eVOL.Application.UseCases.UserCases
 {
     public class GetUserUseCase : IGetUserUseCase
     {
-        private readonly IUserRepository _userRepo;
+        private readonly IMySqlUnitOfWork _uow;
 
-        public GetUserUseCase(IUserRepository userRepo)
+        public GetUserUseCase(IMySqlUnitOfWork uow)
         {
-            _userRepo = userRepo;
+            _uow = uow;
         }
 
         public async Task<User?> ExecuteAsync(int id)
         {
-            return await _userRepo.GetUserById(id);
+            return await _uow.Users.GetUserById(id);
         }
     }
 }
