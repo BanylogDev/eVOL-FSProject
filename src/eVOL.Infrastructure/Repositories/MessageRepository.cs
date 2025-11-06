@@ -1,4 +1,5 @@
 ﻿using eVOL.Domain.Entities;
+using eVOL.Domain.RepositoriesInteraces;
 using eVOL.Infrastructure.Data;
 using MongoDB.Driver;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Infrastructure.Repositories
 {
-    public class MessageRepository
+    public class MessageRepository : IMessageRepository
     {
         private readonly MongoDbContext _context;
 

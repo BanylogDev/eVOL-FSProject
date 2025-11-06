@@ -166,6 +166,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IChatGroupRepository, ChatGroupRepository>();
 builder.Services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Unit's Of Work
 

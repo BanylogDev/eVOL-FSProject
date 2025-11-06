@@ -12,9 +12,12 @@ namespace eVOL.Infrastructure.Persistence
     {
         private readonly IClientSessionHandle _session;
 
-        public MongoUnitOfWork(IClientSessionHandle session)
+        public IMessageRepository Message { get; }
+
+        public MongoUnitOfWork(IClientSessionHandle session, IMessageRepository message )
         {
             _session = session;
+            Message = message;
         }
 
         public void BeginTransactionAsync() =>

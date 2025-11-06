@@ -8,8 +8,7 @@ namespace eVOL.Domain.RepositoriesInteraces
 {
     public interface IMongoUnitOfWork
     {
-
-        public IMessageRepository Message {  get; }
+        IMessageRepository Message { get; }
 
         void BeginTransactionAsync();
         Task CommitAsync();
