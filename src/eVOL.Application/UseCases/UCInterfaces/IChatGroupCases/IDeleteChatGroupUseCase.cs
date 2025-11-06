@@ -9,6 +9,6 @@ namespace eVOL.Application.UseCases.UCInterfaces.IChatGroupCases
 {
     public interface IDeleteChatGroupUseCase
     {
-        Task<ChatGroup?> ExecuteAsync(int id);
+        Task<ChatGroup?> ExecuteAsync(int chatGroupId, int chatGroupOwnerId);
     }
 }

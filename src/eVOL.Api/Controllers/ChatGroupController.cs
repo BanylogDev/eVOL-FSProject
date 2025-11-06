@@ -14,16 +14,17 @@ namespace eVOL.API.Controllers
         private readonly ICreateChatGroupUseCase _createChatGroupUseCase;
         private readonly IDeleteChatGroupUseCase _deleteChatGroupUseCase;
         private readonly IGetChatGroupByIdUseCase _getChatGroupByIdUseCase;
-        private readonly IAddUserToChatGroupUseCase _addUserToChatGroupUseCase;
-        private readonly IRemoveUserFromChatGroupUseCase _removeUserFromChatGroupUseCase;
+        private readonly ITransferOwnershipOfChatGroupUseCase _transferOwnershipOfChatGroupUseCase;
 
-        public ChatGroupController(ICreateChatGroupUseCase createChatGroupUseCase, IDeleteChatGroupUseCase deleteChatGroupUseCase, IGetChatGroupByIdUseCase getChatGroupByIdUseCase, IAddUserToChatGroupUseCase addUserToChatGroupUseCase, IRemoveUserFromChatGroupUseCase removeUserFromChatGroupUseCase)
+        public ChatGroupController(ICreateChatGroupUseCase createChatGroupUseCase, 
+            IDeleteChatGroupUseCase deleteChatGroupUseCase, 
+            IGetChatGroupByIdUseCase getChatGroupByIdUseCase, 
+            ITransferOwnershipOfChatGroupUseCase transferOwnershipOfChatGroupUseCase)
         {
             _createChatGroupUseCase = createChatGroupUseCase;
             _deleteChatGroupUseCase = deleteChatGroupUseCase;
             _getChatGroupByIdUseCase = getChatGroupByIdUseCase;
-            _addUserToChatGroupUseCase = addUserToChatGroupUseCase;
-            _removeUserFromChatGroupUseCase = removeUserFromChatGroupUseCase;
+            _transferOwnershipOfChatGroupUseCase = transferOwnershipOfChatGroupUseCase;
         }
 
         [HttpPost("create")]
@@ -45,10 +46,10 @@ namespace eVOL.API.Controllers
             return Ok(chatGroup);
         }
 
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteChatGroup(int id)
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteChatGroup([FromBody] DeleteChatGroupDTO dto)
         {
-            var chatGroup = await _deleteChatGroupUseCase.ExecuteAsync(id);
+            var chatGroup = await _deleteChatGroupUseCase.ExecuteAsync(dto.ChatGroupId, dto.ChatGroupOwnerId);
 
             if (chatGroup == null)
             {
@@ -69,6 +70,26 @@ namespace eVOL.API.Controllers
             }
 
             return Ok(chatGroup);
+        }
+
+        [HttpPut("transfer")]
+        public async Task<IActionResult> TransferOwnershipOfChatGroup(TransferOwnershipOfCGDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var chatGroup = await _transferOwnershipOfChatGroupUseCase.ExecuteAsync(dto.CurrentOwnerId, dto.NewOwnerId, dto.ChatGroupId);
+
+            if (chatGroup == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(chatGroup);
+
+
         }
 
     }

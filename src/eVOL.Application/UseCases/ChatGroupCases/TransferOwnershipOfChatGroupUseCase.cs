@@ -9,43 +9,45 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.UseCases.ChatGroupCases
 {
-    public class RemoveUserFromChatGroupUseCase : IRemoveUserFromChatGroupUseCase
+    public class TransferOwnershipOfChatGroupUseCase : ITransferOwnershipOfChatGroupUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
 
-        public RemoveUserFromChatGroupUseCase(IMySqlUnitOfWork uow)
+        public TransferOwnershipOfChatGroupUseCase(IMySqlUnitOfWork uow)
         {
             _uow = uow;
-        }
+        }   
 
-        public async Task<User?> ExecuteAsync(int userId, string chatGroupName)
+        public async Task<ChatGroup?> ExecuteAsync(int currentOwnerId, int newOwnerId, int chatGroupId)
         {
 
             await _uow.BeginTransactionAsync();
 
             try
             {
-                var user = await _uow.Users.GetUserById(userId);
+                var currentOwner = await _uow.Users.GetUserById(currentOwnerId);
 
-                var chatGroup = await _uow.ChatGroup.GetChatGroupByName(chatGroupName);
+                var newOwner = await _uow.Users.GetUserById(newOwnerId);
 
-                if (user == null || chatGroup == null || !chatGroup.GroupUsers.Contains(user) || chatGroup.OwnerId == user.UserId)
+                var chatGroup = await _uow.ChatGroup.GetChatGroupById(chatGroupId);
+
+                if (currentOwner == null || newOwner == null || chatGroup == null || chatGroup.OwnerId != currentOwnerId)
                 {
                     return null;
                 }
 
-                chatGroup.GroupUsers.Remove(user);
-                chatGroup.TotalUsers -= 1;
+                chatGroup.OwnerId = newOwnerId;
 
                 await _uow.CommitAsync();
 
-                return user;
+                return chatGroup;
             }
             catch
             {
                 await _uow.RollbackAsync();
                 throw;
             }
+
 
         }
     }

@@ -1,4 +1,5 @@
 ﻿using eVOL.Application.DTOs;
+using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.UseCases.ChatGroupCases
 {
-    public class DeleteChatGroupUseCase
+    public class DeleteChatGroupUseCase : IDeleteChatGroupUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
 
@@ -18,21 +19,21 @@ namespace eVOL.Application.UseCases.ChatGroupCases
             _uow = uow;
         }
 
-        public async Task<ChatGroup?> ExecuteAsync(int id)
+        public async Task<ChatGroup?> ExecuteAsync(int chatGroupId, int chatGroupOwnerId)
         {
 
             await _uow.BeginTransactionAsync();
 
             try
             {
-                var chatGroup = await _uow.ChatGroup.GetChatGroupById(id);
+                var chatGroup = await _uow.ChatGroup.GetChatGroupById(chatGroupId);
 
-                if (chatGroup == null)
+                if (chatGroup == null || chatGroup.OwnerId != chatGroupOwnerId)
                 {
                     return null;
                 }
 
-                await _uow.ChatGroup.CreateChatGroup(chatGroup);
+                _uow.ChatGroup.DeleteChatGroup(chatGroup);
                 await _uow.CommitAsync();
 
                 return chatGroup;

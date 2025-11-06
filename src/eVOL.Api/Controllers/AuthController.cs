@@ -31,6 +31,11 @@ namespace BankApi_Clean_Architecture.Controllers
 
             var user = await _registerUserUseCase.ExecuteAsync(dto);
 
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
             return Ok(new { message = "Registration successful", user.Name, user.Email });
         }
 

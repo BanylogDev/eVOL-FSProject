@@ -10,7 +10,7 @@ namespace eVOL.Domain.RepositoriesInteraces
     public interface ISupportTicketRepository
     {
         Task<SupportTicket> CreateSupportTicket(SupportTicket supportTicket);
-        Task<SupportTicket?> DeleteSupportTicket(SupportTicket supportTicket);
+        SupportTicket? DeleteSupportTicket(SupportTicket supportTicket);
         Task<SupportTicket?> GetSupportTicketById(int id);
     }
 }

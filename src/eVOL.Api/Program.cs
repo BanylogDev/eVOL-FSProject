@@ -1,7 +1,11 @@
 using eVOL.API.Hubs;
 using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.AdminCases;
+using eVOL.Application.UseCases.ChatGroupCases;
+using eVOL.Application.UseCases.SupportTicketCases;
 using eVOL.Application.UseCases.UCInterfaces.IAdminCases;
+using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
+using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Application.UseCases.UserCases;
 using eVOL.Domain.RepositoriesInteraces;
@@ -17,8 +21,6 @@ using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
@@ -43,7 +45,6 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 );
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -110,14 +111,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.AllowAnyMethod() // Allow POST, GET, etc.
-              .AllowAnyHeader()  // Allow necessary headers
-              .WithOrigins("http://localhost:5001") // <-- IMPORTANT: Replace with your Blazor app's URL
-              .AllowCredentials(); // Crucial for SignalR authentication
+        policy.AllowAnyMethod()
+              .AllowAnyHeader()  
+              .WithOrigins("http://localhost:5001")
+              .AllowCredentials();
     });
 });
 
 // Services
+
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -137,6 +139,26 @@ builder.Services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
 
+// Chat Group Use Cases
+
+builder.Services.AddScoped<IAddUserToChatGroupUseCase, AddUserToChatGroupUseCase>();
+builder.Services.AddScoped<ICreateChatGroupUseCase, CreateChatGroupUseCase>();
+builder.Services.AddScoped<IDeleteChatGroupUseCase, DeleteChatGroupUseCase>();
+builder.Services.AddScoped<IGetChatGroupByIdUseCase, GetChatGroupByIdUseCase>();
+builder.Services.AddScoped<ILeaveChatGroupUseCase, LeaveChatGroupUseCase>();
+builder.Services.AddScoped<IRemoveUserFromChatGroupUseCase, RemoveUserFromChatGroupUseCase>();
+builder.Services.AddScoped<ISendChatGroupMessageUseCase, SendChatGroupMessageUseCase>();
+builder.Services.AddScoped<ITransferOwnershipOfChatGroupUseCase, TransferOwnershipOfChatGroupUseCase>();
+
+// Support Ticket Use Cases
+
+builder.Services.AddScoped<IClaimSupportTicketUseCase, ClaimSupportTicketUseCase>();
+builder.Services.AddScoped<ICreateSupportTicketUseCase, CreateSupportTicketUseCase>();
+builder.Services.AddScoped<IDeleteSupportTicketUseCase, DeleteSupportTicketUseCase>();
+builder.Services.AddScoped<IGetSupportTicketByIdUseCase, GetSupportTicketByIdUseCase>();
+builder.Services.AddScoped<IUnClaimSupportTicketUseCase, UnClaimSupportTicketUseCase>();
+
+
 // Repositories
 
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
@@ -152,7 +174,6 @@ builder.Services.AddScoped<IMongoUnitOfWork, MongoUnitOfWork>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -161,12 +182,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
-// --- 3. Use CORS and SignalR Middleware ---
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map endpoints
 app.MapControllers();
 app.MapHub<ChatHub>("/chat-hub");
 

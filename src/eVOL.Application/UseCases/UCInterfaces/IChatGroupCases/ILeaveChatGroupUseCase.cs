@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.UseCases.UCInterfaces.IChatGroupCases
 {
-    public interface IRemoveUserFromChatGroupUseCase
+    public interface ILeaveChatGroupUseCase
     {
         Task<User?> ExecuteAsync(int userId, string chatGroupName);
     }

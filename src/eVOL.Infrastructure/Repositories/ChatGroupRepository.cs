@@ -26,7 +26,7 @@ namespace eVOL.Infrastructure.Repositories
             return chatGroup;
         }
 
-        public async Task<ChatGroup?> DeleteChatGroup(ChatGroup chatGroup)
+        public ChatGroup? DeleteChatGroup(ChatGroup chatGroup)
         {
 
             _context.ChatGroups.Remove(chatGroup);

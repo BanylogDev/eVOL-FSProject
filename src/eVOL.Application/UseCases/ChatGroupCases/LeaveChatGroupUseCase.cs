@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.UseCases.ChatGroupCases
 {
-    public class AddUserToChatGroupUseCase : IAddUserToChatGroupUseCase
+    public class LeaveChatGroupUseCase : ILeaveChatGroupUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
 
-        public AddUserToChatGroupUseCase(IMySqlUnitOfWork uow)
+        public LeaveChatGroupUseCase(IMySqlUnitOfWork uow)
         {
             _uow = uow;
         }
@@ -21,7 +21,7 @@ namespace eVOL.Application.UseCases.ChatGroupCases
         public async Task<User?> ExecuteAsync(int userId, string chatGroupName)
         {
 
-            await _uow.BeginTransactionAsync(); 
+            await _uow.BeginTransactionAsync();
 
             try
             {
@@ -29,13 +29,18 @@ namespace eVOL.Application.UseCases.ChatGroupCases
 
                 var chatGroup = await _uow.ChatGroup.GetChatGroupByName(chatGroupName);
 
-                if (user == null || chatGroup == null || chatGroup.GroupUsers.Contains(user))
+                if (chatGroup == null || user == null || !chatGroup.GroupUsers.Contains(user))
                 {
                     return null;
                 }
 
-                chatGroup.GroupUsers.Add(user);
-                chatGroup.TotalUsers += 1;
+                chatGroup.GroupUsers.Remove(user);
+                chatGroup.TotalUsers -= 1;
+
+                if (chatGroup.TotalUsers == 0)
+                {
+                    _uow.ChatGroup.DeleteChatGroup(chatGroup);
+                }
 
                 await _uow.CommitAsync();
 
@@ -46,6 +51,8 @@ namespace eVOL.Application.UseCases.ChatGroupCases
                 await _uow.RollbackAsync();
                 throw;
             }
+
+
         }
     }
 }

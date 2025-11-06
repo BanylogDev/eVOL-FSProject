@@ -1,4 +1,5 @@
 ﻿using eVOL.Application.DTOs;
+using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.UseCases.SupportTicketCases
 {
-    public class CreateSupportTicketUseCase
+    public class CreateSupportTicketUseCase : ICreateSupportTicketUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
 

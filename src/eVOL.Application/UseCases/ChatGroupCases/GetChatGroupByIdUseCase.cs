@@ -1,4 +1,5 @@
-﻿using eVOL.Domain.Entities;
+﻿using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
+using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.UseCases.ChatGroupCases
 {
-    public class GetChatGroupByIdUseCase
+    public class GetChatGroupByIdUseCase : IGetChatGroupByIdUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
 

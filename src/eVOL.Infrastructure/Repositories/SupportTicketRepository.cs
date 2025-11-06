@@ -27,7 +27,7 @@ namespace eVOL.Infrastructure.Repositories
             return supportTicket;
         }
 
-        public async Task<SupportTicket?> DeleteSupportTicket(SupportTicket supportTicket)
+        public SupportTicket? DeleteSupportTicket(SupportTicket supportTicket)
         {
 
             _context.SupportTickets.Remove(supportTicket);
