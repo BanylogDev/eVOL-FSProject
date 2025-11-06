@@ -32,7 +32,7 @@ namespace eVOL.Application.UseCases.SupportTicketCases
                     return null;
                 }
 
-                await _uow.SupportTicket.DeleteSupportTicket(supportTicket);
+                _uow.SupportTicket.DeleteSupportTicket(supportTicket);
                 await _uow.CommitAsync();
 
                 return supportTicket;
