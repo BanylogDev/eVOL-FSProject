@@ -10,6 +10,6 @@ namespace eVOL.Application.UseCases.UCInterfaces.IUserCases
 {
     public interface IGetUserUseCase
     {
-        Task<GetUserResponse?> ExecuteAsync(int id)
+        Task<GetUserResponse?> ExecuteAsync(int id);
     }
 }
