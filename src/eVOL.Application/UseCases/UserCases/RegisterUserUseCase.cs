@@ -1,4 +1,6 @@
-﻿using eVOL.Application.DTOs;
+﻿using AutoMapper;
+using eVOL.Application.DTOs.Requests;
+using eVOL.Application.DTOs.Responses.User;
 using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.Entities;
@@ -19,15 +21,17 @@ namespace eVOL.Application.UseCases.UserCases
         private readonly IMySqlUnitOfWork _uow;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ILogger<RegisterUserUseCase> _logger;
+        private readonly IMapper _mapper;
 
-        public RegisterUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, ILogger<RegisterUserUseCase> logger)
+        public RegisterUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, ILogger<RegisterUserUseCase> logger, IMapper mapper)
         {
             _uow = uow;
             _passwordHasher = passwordHasher;
             _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<User?> ExecuteAsync(RegisterDTO dto)
+        public async Task<RegisterUserResponse?> ExecuteAsync(RegisterDTO dto)
         {
 
             _logger.LogInformation("Starting RegisterUserUseCase for Name: {Name}, Email: {Email}", dto.Name, dto.Email);
@@ -81,7 +85,7 @@ namespace eVOL.Application.UseCases.UserCases
 
                 _logger.LogInformation("RegisterUserUseCase completed successfully for Name: {Name}, Email: {Email}", dto.Name, dto.Email);
 
-                return newUser;
+                return _mapper.Map<RegisterUserResponse>(newUser);
             }
             catch (Exception ex)
             {

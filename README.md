@@ -30,6 +30,7 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 | Real-time         | SignalR                                                  |
 | Message Brokler   | RabbitMQ                                |
 | Load Balancing    | NGINX (reverse proxy for multiple API instances)        |
+| Logging           | Serilog - Seq                                            |
 | Containerization  | Docker, Docker Compose                                   |
 | CI/CD             | GitHub Actions Pipeline                                  |
 

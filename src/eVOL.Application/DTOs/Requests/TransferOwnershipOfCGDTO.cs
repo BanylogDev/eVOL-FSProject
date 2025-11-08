@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eVOL.Application.DTOs
+namespace eVOL.Application.DTOs.Requests
 {
-    public class SupportTicketDTO
+    public class TransferOwnershipOfCGDTO
     {
         [Required]
-        public string Category { get; set; } = string.Empty;
+        public int ChatGroupId { get; set; }
         [Required]
-        public string Text { get; set; } = string.Empty;
+        public int CurrentOwnerId { get; set; }
         [Required]
-        public int OpenedBy { get; set; }
+        public int NewOwnerId { get; set; }
     }
 }

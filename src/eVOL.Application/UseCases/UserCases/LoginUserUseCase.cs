@@ -1,4 +1,7 @@
-﻿using eVOL.Application.DTOs;
+﻿using AutoMapper;
+using eVOL.Application.DTOs;
+using eVOL.Application.DTOs.Responses;
+using eVOL.Application.DTOs.Responses.User;
 using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.Entities;
@@ -20,18 +23,25 @@ namespace eVOL.Application.UseCases.UserCases
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _config;
         private readonly ILogger<LoginUserUseCase> _logger;
+        private readonly IMapper _mapper;
 
-        
-        public LoginUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, IJwtService jwtService, IConfiguration config, ILogger<LoginUserUseCase> logger)
+
+        public LoginUserUseCase(IMySqlUnitOfWork uow, 
+            IPasswordHasher passwordHasher, 
+            IJwtService jwtService, 
+            IConfiguration config, 
+            ILogger<LoginUserUseCase> logger, 
+            IMapper mapper)
         {
             _uow = uow;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
             _config = config;
             _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<User?> ExecuteAsync(LoginDTO dto)
+        public async Task<LoginUserResponse?> ExecuteAsync(LoginDTO dto)
         {
 
             _logger.LogInformation("Starting LoginUserUseCase for Email: {Email}", dto.Email);
@@ -63,7 +73,7 @@ namespace eVOL.Application.UseCases.UserCases
 
                 _logger.LogInformation("LoginUserUseCase completed successfully for User ID: {UserId}", user.UserId);
 
-                return user;
+                return _mapper.Map<LoginUserResponse>(user);
             }
             catch (Exception ex)
             {

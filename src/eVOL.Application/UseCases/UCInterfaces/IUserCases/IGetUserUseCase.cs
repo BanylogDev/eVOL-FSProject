@@ -1,4 +1,5 @@
-﻿using eVOL.Domain.Entities;
+﻿using eVOL.Application.DTOs.Responses.User;
+using eVOL.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace eVOL.Application.UseCases.UCInterfaces.IUserCases
 {
     public interface IGetUserUseCase
     {
-        Task<User?> ExecuteAsync(int id);
+        Task<GetUserResponse?> ExecuteAsync(int id)
     }
 }

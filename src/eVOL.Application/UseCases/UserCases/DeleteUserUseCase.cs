@@ -1,4 +1,4 @@
-﻿using eVOL.Application.DTOs;
+﻿using eVOL.Application.DTOs.Requests;
 using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.Entities;

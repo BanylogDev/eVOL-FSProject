@@ -1,4 +1,4 @@
-﻿using eVOL.Application.DTOs;
+﻿using eVOL.Application.DTOs.Requests;
 using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;

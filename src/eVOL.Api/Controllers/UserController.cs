@@ -1,4 +1,4 @@
-﻿using eVOL.Application.DTOs;
+﻿using eVOL.Application.DTOs.Requests;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Application.UseCases.UserCases;
 using Microsoft.AspNetCore.Authorization;

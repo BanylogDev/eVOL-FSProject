@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eVOL.Application.DTOs
+namespace eVOL.Application.DTOs.Requests
 {
     public class ClaimSupportTicketDTO
     {

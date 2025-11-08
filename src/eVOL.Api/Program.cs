@@ -1,4 +1,5 @@
 using eVOL.API.Hubs;
+using eVOL.Application.Mappings;
 using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.AdminCases;
 using eVOL.Application.UseCases.ChatGroupCases;
@@ -17,8 +18,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using StackExchange.Redis;
 using Serilog;
+using StackExchange.Redis;
 using System;
 using System.Text;
 
@@ -144,6 +145,8 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 
 
 // Services

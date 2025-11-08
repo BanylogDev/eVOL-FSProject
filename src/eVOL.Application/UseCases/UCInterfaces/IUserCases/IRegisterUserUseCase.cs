@@ -1,4 +1,6 @@
-﻿using eVOL.Application.DTOs;
+﻿using eVOL.Application.DTOs.Requests;
+using eVOL.Application.DTOs.Responses;
+using eVOL.Application.DTOs.Responses.User;
 using eVOL.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,6 @@ namespace eVOL.Application.UseCases.UCInterfaces.IUserCases
 {
     public interface IRegisterUserUseCase
     {
-        Task<User?> ExecuteAsync(RegisterDTO dto);
+        Task<RegisterUserResponse?> ExecuteAsync(RegisterDTO dto);
     }
 }

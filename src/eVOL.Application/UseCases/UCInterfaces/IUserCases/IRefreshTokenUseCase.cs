@@ -1,4 +1,4 @@
-﻿using eVOL.Application.DTOs;
+﻿using eVOL.Application.DTOs.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,6 @@
-﻿using eVOL.Application.UseCases.UCInterfaces.IUserCases;
+﻿using AutoMapper;
+using eVOL.Application.DTOs.Responses.User;
+using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.Extensions.Logging;
@@ -14,14 +16,16 @@ namespace eVOL.Application.UseCases.UserCases
     {
         private readonly IMySqlUnitOfWork _uow;
         private readonly ILogger<GetUserUseCase> _logger;
+        private readonly IMapper _mapper;
 
-        public GetUserUseCase(IMySqlUnitOfWork uow, ILogger<GetUserUseCase> logger)
+        public GetUserUseCase(IMySqlUnitOfWork uow, ILogger<GetUserUseCase> logger, IMapper mapper)
         {
             _uow = uow;
             _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<User?> ExecuteAsync(int id)
+        public async Task<GetUserResponse?> ExecuteAsync(int id)
         {
             var user = await _uow.Users.GetUserById(id);
 
@@ -33,7 +37,7 @@ namespace eVOL.Application.UseCases.UserCases
 
             _logger.LogInformation("GetUserUseCase: Successfully retrieved User with ID {UserId}.", id);
 
-            return user;   
+            return _mapper.Map<GetUserResponse>(user);   
         }
     }
 }

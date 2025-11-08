@@ -1,4 +1,6 @@
 ﻿using eVOL.Application.DTOs;
+using eVOL.Application.DTOs.Responses;
+using eVOL.Application.DTOs.Responses.User;
 using eVOL.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,6 @@ namespace eVOL.Application.UseCases.UCInterfaces.IUserCases
 {
     public interface ILoginUserUseCase
     {
-        Task<User?> ExecuteAsync(LoginDTO dto);
+        Task<LoginUserResponse?> ExecuteAsync(LoginDTO dto);
     }
 }
