@@ -16,24 +16,51 @@ using eVOL.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using StackExchange.Redis;
+using Serilog;
 using System;
 using System.Text;
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentUserName()
+    .Enrich.WithMachineName()
+    .Enrich.WithProcessId()
+    .Enrich.WithThreadId()
+    .Enrich.WithCorrelationId()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://evol.seq:80")
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+        Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        )
     )
 );
+
 builder.Services.AddSingleton<MongoDbContext>(sp =>
 {
     var config = builder.Configuration;
     var connectionString = config.GetConnectionString("MongoDB");
     return new MongoDbContext(connectionString, "eVOLChat");
 });
+
+builder.Services.AddScoped<IClientSessionHandle>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.StartSession(); 
+});
+
+
 
 
 var redisConnectionString = builder.Configuration["CacheSettings:RedisConnection"];
@@ -118,6 +145,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 // Services
 
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -175,11 +203,10 @@ builder.Services.AddScoped<IMongoUnitOfWork, MongoUnitOfWork>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseRouting();
 

@@ -2,6 +2,7 @@
 using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +14,18 @@ namespace eVOL.Application.UseCases.SupportTicketCases
     public class ClaimSupportTicketUseCase : IClaimSupportTicketUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
+        private readonly ILogger<ClaimSupportTicketDTO> _logger;
 
-        public ClaimSupportTicketUseCase(IMySqlUnitOfWork uow)
+        public ClaimSupportTicketUseCase(IMySqlUnitOfWork uow, ILogger<ClaimSupportTicketDTO> logger)
         {
             _uow = uow;
+            _logger = logger;
         }
 
         public async Task<User?> ExecuteAsync(ClaimSupportTicketDTO dto)
         {
+
+            _logger.LogInformation("Starting ClaimSupportTicketUseCase for SupportTicket ID: {SupportTicketId} by User ID: {UserId}", dto.Id, dto.OpenedBy);
 
             await _uow.BeginTransactionAsync();
 
@@ -32,19 +37,25 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 
                 if (user == null || supportTicket == null || supportTicket.ClaimedStatus == true)
                 {
+                    _logger.LogWarning("ClaimSupportTicketUseCase failed: User or SupportTicket not found, or SupportTicket already claimed.");
                     return null;
                 }
 
+                _logger.LogInformation("Claiming SupportTicket ID: {SupportTicketId} by User ID: {UserId}", dto.Id, dto.OpenedBy);
                 supportTicket.ClaimedBy = dto.OpenedBy;
                 supportTicket.ClaimedStatus = true;
+                _logger.LogInformation("SupportTicket ID: {SupportTicketId} successfully claimed by User ID: {UserId}", dto.Id, dto.OpenedBy);
 
                 await _uow.CommitAsync();
 
+                _logger.LogInformation("ClaimSupportTicketUseCase completed successfully for SupportTicket ID: {SupportTicketId} by User ID: {UserId}", dto.Id, dto.OpenedBy);
+
                 return user;
             }
-            catch
+            catch (Exception ex)
             {
                 await _uow.RollbackAsync();
+                _logger.LogError(ex, "ClaimSupportTicketUseCase failed and rolled back for SupportTicket ID: {SupportTicketId} by User ID: {UserId}", dto.Id, dto.OpenedBy);
                 throw;
             }
 

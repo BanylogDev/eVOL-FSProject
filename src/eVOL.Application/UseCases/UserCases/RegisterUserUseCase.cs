@@ -5,6 +5,7 @@ using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using eVOL.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +18,19 @@ namespace eVOL.Application.UseCases.UserCases
     {
         private readonly IMySqlUnitOfWork _uow;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly ILogger<RegisterUserUseCase> _logger;
 
-        public RegisterUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher)
+        public RegisterUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, ILogger<RegisterUserUseCase> logger)
         {
             _uow = uow;
             _passwordHasher = passwordHasher;
+            _logger = logger;
         }
 
         public async Task<User?> ExecuteAsync(RegisterDTO dto)
         {
+
+            _logger.LogInformation("Starting RegisterUserUseCase for Name: {Name}, Email: {Email}", dto.Name, dto.Email);
 
             await _uow.BeginTransactionAsync();
 
@@ -36,8 +41,12 @@ namespace eVOL.Application.UseCases.UserCases
 
                 if (existingName != null || existingEmail != null)
                 {
+                    _logger.LogWarning("RegisterUserUseCase failed: Name or Email already exists. Name: {Name}, Email: {Email}", dto.Name, dto.Email);
                     return null;
                 }
+
+
+                _logger.LogInformation("Hashing password for Name: {Name}", dto.Name);
 
                 var hashedPassword = _passwordHasher.HashPassword(dto.Password);
 
@@ -65,14 +74,19 @@ namespace eVOL.Application.UseCases.UserCases
                     CreatedAt = DateTime.UtcNow,
                 };
 
+                _logger.LogInformation("Registering new user: Name: {Name}, Email: {Email}", dto.Name, dto.Email);
+
                 await _uow.Auth.Register(newUser);
                 await _uow.CommitAsync();
 
+                _logger.LogInformation("RegisterUserUseCase completed successfully for Name: {Name}, Email: {Email}", dto.Name, dto.Email);
+
                 return newUser;
             }
-            catch
+            catch (Exception ex)
             {
                 await _uow.RollbackAsync();
+                _logger.LogError(ex, "RegisterUserUseCase failed and rolled back for Name: {Name}, Email: {Email}", dto.Name, dto.Email);
                 throw;
             }
 

@@ -8,8 +8,8 @@ namespace eVOL.Domain.ValueObjects
 {
     public class Money
     {
-        public double Balance { get; } 
-        public string Currency { get; }
+        public double Balance { get; private set; } 
+        public string Currency { get; private set;   }
         
         public Money(double balance, string currency)
         {
@@ -25,5 +25,7 @@ namespace eVOL.Domain.ValueObjects
             Balance = balance;
             Currency = currency;
         }
+
+        private Money() { }
     }
 }

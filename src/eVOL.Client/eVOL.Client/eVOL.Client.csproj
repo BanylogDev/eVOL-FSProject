@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
 
+	<Target Name="CopyBlazorClient" AfterTargets="Build">
+		<Exec Command="dotnet publish ../eVOL.Client.Client/eVOL.Client.Client.csproj -c $(Configuration) -o $(ProjectDir)wwwroot" />
+	</Target>
+
 </Project>

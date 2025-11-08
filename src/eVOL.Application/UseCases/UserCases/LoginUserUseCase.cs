@@ -4,6 +4,7 @@ using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,18 +19,22 @@ namespace eVOL.Application.UseCases.UserCases
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _config;
+        private readonly ILogger<LoginUserUseCase> _logger;
 
         
-        public LoginUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, IJwtService jwtService, IConfiguration config)
+        public LoginUserUseCase(IMySqlUnitOfWork uow, IPasswordHasher passwordHasher, IJwtService jwtService, IConfiguration config, ILogger<LoginUserUseCase> logger)
         {
             _uow = uow;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
             _config = config;
+            _logger = logger;
         }
 
         public async Task<User?> ExecuteAsync(LoginDTO dto)
         {
+
+            _logger.LogInformation("Starting LoginUserUseCase for Email: {Email}", dto.Email);
 
             await _uow.BeginTransactionAsync();
 
@@ -39,11 +44,16 @@ namespace eVOL.Application.UseCases.UserCases
 
                 if (user == null || !_passwordHasher.VerifyPassword(dto.Password, user.Password))
                 {
+                    _logger.LogWarning("LoginUserUseCase failed: User not found or invalid password for Email: {Email}", dto.Email);
                     return null;
                 }
 
+                _logger.LogInformation("Generating tokens for User ID: {UserId}", user.UserId);
+
                 var token = _jwtService.GenerateJwtToken(user, _config);
                 var refreshToken = _jwtService.GenerateRefreshToken();
+
+                _logger.LogInformation("Updating tokens for User ID: {UserId}", user.UserId);
 
                 user.RefreshToken = refreshToken;
                 user.AccessToken = token;
@@ -51,11 +61,14 @@ namespace eVOL.Application.UseCases.UserCases
 
                 await _uow.CommitAsync();
 
+                _logger.LogInformation("LoginUserUseCase completed successfully for User ID: {UserId}", user.UserId);
+
                 return user;
             }
-            catch
+            catch (Exception ex)
             {
                 await _uow.RollbackAsync();
+                _logger.LogError(ex, "LoginUserUseCase failed and rolled back for Email: {Email}", dto.Email);
                 throw;
             }
 

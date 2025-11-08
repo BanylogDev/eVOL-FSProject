@@ -2,6 +2,7 @@
 using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +14,18 @@ namespace eVOL.Application.UseCases.SupportTicketCases
     public class CreateSupportTicketUseCase : ICreateSupportTicketUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
+        private readonly ILogger<CreateSupportTicketUseCase> _logger;
 
-        public CreateSupportTicketUseCase(IMySqlUnitOfWork uow)
+        public CreateSupportTicketUseCase(IMySqlUnitOfWork uow, ILogger<CreateSupportTicketUseCase> logger)
         {
             _uow = uow;
+            _logger = logger;
         }
 
         public async Task<SupportTicket> ExecuteAsync(SupportTicketDTO dto)
         {
+
+            _logger.LogInformation("Starting CreateSupportTicketUseCase for User ID: {UserId}", dto.OpenedBy);
 
             await _uow.BeginTransactionAsync();
 
@@ -36,14 +41,19 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 
                 };
 
+                _logger.LogInformation("Creating SupportTicket for User ID: {UserId}", dto.OpenedBy);
+
                 await _uow.SupportTicket.CreateSupportTicket(newSupportTicket);
                 await _uow.CommitAsync();
 
+                _logger.LogInformation("CreateSupportTicketUseCase completed successfully for User ID: {UserId}", dto.OpenedBy);
+
                 return newSupportTicket;
             }
-            catch
+            catch (Exception ex)
             {
                 await _uow.RollbackAsync();
+                _logger.LogError(ex, "CreateSupportTicketUseCase failed and rolled back for User ID: {UserId}", dto.OpenedBy);
                 throw;
             }
 
