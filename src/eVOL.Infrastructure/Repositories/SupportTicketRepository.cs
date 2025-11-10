@@ -1,6 +1,7 @@
 ﻿using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
 using eVOL.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,6 +39,11 @@ namespace eVOL.Infrastructure.Repositories
         public async Task<SupportTicket?> GetSupportTicketById(int id)
         {
             return await _context.SupportTickets.FindAsync(id);
+        }
+
+        public async Task<SupportTicket?> GetSupportTicketByName(string name)
+        {
+            return await _context.SupportTickets.FirstOrDefaultAsync(st => st.Name == name);
         }
     }
 }

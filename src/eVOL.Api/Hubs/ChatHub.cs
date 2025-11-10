@@ -1,4 +1,5 @@
 ﻿using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
+using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Domain.Entities;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,16 +12,19 @@ namespace eVOL.API.Hubs
         private readonly IRemoveUserFromChatGroupUseCase _removeUserFromChatGroupUseCase;
         private readonly ISendChatGroupMessageUseCase _sendChatGroupMessageUseCase;
         private readonly ILeaveChatGroupUseCase _leaveChatGroupUseCase;
+        private readonly ISendSupportTicketMessageUseCase _sendSupportTicketMessageUseCase;
 
-        public ChatHub(IAddUserToChatGroupUseCase addUserToChatGroupUseCase, 
-            IRemoveUserFromChatGroupUseCase removeUserFromChatGroupUseCase, 
-            ISendChatGroupMessageUseCase sendChatGroupMessageUseCase, 
-            ILeaveChatGroupUseCase leaveChatGroupUseCase)
+        public ChatHub(IAddUserToChatGroupUseCase addUserToChatGroupUseCase,
+            IRemoveUserFromChatGroupUseCase removeUserFromChatGroupUseCase,
+            ISendChatGroupMessageUseCase sendChatGroupMessageUseCase,
+            ILeaveChatGroupUseCase leaveChatGroupUseCase,
+            ISendSupportTicketMessageUseCase sendSupportTicketMessageUseCase)
         {
             _addUserToChatGroupUseCase = addUserToChatGroupUseCase;
             _removeUserFromChatGroupUseCase = removeUserFromChatGroupUseCase;
             _sendChatGroupMessageUseCase = sendChatGroupMessageUseCase;
             _leaveChatGroupUseCase = leaveChatGroupUseCase;
+            _sendSupportTicketMessageUseCase = sendSupportTicketMessageUseCase;
         }
 
         public async Task AddUserToGroup(string groupName, int userId)
@@ -86,5 +90,16 @@ namespace eVOL.API.Hubs
 
             await Clients.Group(groupName).SendAsync("ReceiveGroupCustomMessage", user.Name, newMessage);
         }
+
+        public async Task SendSupportTicketMessage(string supportTicketName, int userId, string message)
+        {
+            (ChatMessage? newMessage, User? user) = await _sendSupportTicketMessageUseCase.ExecuteAsync(message, supportTicketName, userId);
+            if (newMessage == null || user == null)
+            {
+                return;
+            }
+            await Clients.Group(supportTicketName).SendAsync("ReceiveSupportTicketCustomMessage", user.Name, newMessage);
+        }
+
     }
 }

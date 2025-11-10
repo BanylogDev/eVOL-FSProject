@@ -73,6 +73,8 @@ namespace eVOL.Application.UseCases.UserCases
 
                 _logger.LogInformation("LoginUserUseCase completed successfully for User ID: {UserId}", user.UserId);
 
+                _logger.LogInformation($"handled by {Environment.MachineName}");
+
                 return _mapper.Map<LoginUserResponse>(user);
             }
             catch (Exception ex)

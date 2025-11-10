@@ -187,6 +187,7 @@ builder.Services.AddScoped<IClaimSupportTicketUseCase, ClaimSupportTicketUseCase
 builder.Services.AddScoped<ICreateSupportTicketUseCase, CreateSupportTicketUseCase>();
 builder.Services.AddScoped<IDeleteSupportTicketUseCase, DeleteSupportTicketUseCase>();
 builder.Services.AddScoped<IGetSupportTicketByIdUseCase, GetSupportTicketByIdUseCase>();
+builder.Services.AddScoped<ISendSupportTicketMessageUseCase, SendSupportTicketMessageUseCase>();
 builder.Services.AddScoped<IUnClaimSupportTicketUseCase, UnClaimSupportTicketUseCase>();
 
 

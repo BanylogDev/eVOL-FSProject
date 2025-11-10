@@ -85,6 +85,8 @@ namespace eVOL.Application.UseCases.UserCases
 
                 _logger.LogInformation("RegisterUserUseCase completed successfully for Name: {Name}, Email: {Email}", dto.Name, dto.Email);
 
+                _logger.LogInformation($"handled by {Environment.MachineName}");
+
                 return _mapper.Map<RegisterUserResponse>(newUser);
             }
             catch (Exception ex)

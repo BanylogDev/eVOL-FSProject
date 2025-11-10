@@ -9,8 +9,9 @@ namespace eVOL.Domain.Entities
     public class SupportTicket
     {
         public int Id { get; set; }
-        public string Category { get; set; } = string.Empty;
-        public string Text { get; set; } = string.Empty;
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public string Text { get; set; }
         public int OpenedBy { get; set; }
         public int ClaimedBy { get; set; }
         public bool ClaimedStatus { get; set; }
