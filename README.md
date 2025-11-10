@@ -1,6 +1,6 @@
 ﻿# eVOL - Advanced Chat Messaging App
 
-A modern **full stack chat messaging application** built with .NET 8, Blazor WebAssembly, SignalR, and multiple databases.
+A modern **backend chat messaging application** built with .NET 8, SignalR, and multiple databases.
 
 ---
 
@@ -10,7 +10,7 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 - **JWT authentication** and password hashing (BCrypt)
 - **AES encryption** for sensitive data
 - **Caching with Redis**
-- **User profiles in MySQL**
+- **User profiles and more in MySQL**
 - **Chat messages in MongoDB**
 - Future-ready: RabbitMQ support for messaging queue
 - **Scalable API layer** with multiple instances behind **NGINX load balancer**
@@ -23,7 +23,6 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 | Layer            | Technology                                               |
 |------------------|----------------------------------------------------------|
 | Backend           | .NET 8, ASP.NET Core Web API, Clean Architecture        |
-| Frontend          | Blazor WebAssembly                                       |
 | Database          | MySQL (users), MongoDB (chat messages)                  |
 | Caching           | Redis                                                    |
 | Security          | JWT Tokens, AES Encryption, BCrypt Hashing              |
@@ -37,8 +36,7 @@ A modern **full stack chat messaging application** built with .NET 8, Blazor Web
 ---
 
 ## 🏗 Project Architecture
-
-- **Frontend:** Blazor WebAssembly application  
+ 
 - **Backend:** Api server using **NGINX** for load balancing  
 - **Databases:** MySQL for users, MongoDB for chat messages, Redis for caching  
 - **Real Time Communication:** SignalR & RabbitMQ for latest and modern messaging
