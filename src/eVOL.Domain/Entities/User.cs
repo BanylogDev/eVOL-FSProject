@@ -11,13 +11,8 @@ namespace eVOL.Domain.Entities
     public class User
     {
         public int UserId { get; set; }
-        [Required]
-        [StringLength(16, MinimumLength = 4)]
         public string Name { get; set; } = string.Empty;
-        [Required]
-        [EmailAddress]
         public string Email { get; set; } = string.Empty;
-        [Required]
         public string Password { get; set; } = string.Empty;
         public Address? Address { get; set; }
         public string Role { get; set; } = "User";

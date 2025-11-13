@@ -38,7 +38,7 @@ namespace eVOL.Application.UseCases.UserCases
 
                 if (user == null ||
                     dto.Password != dto.ConfirmPassword ||
-                   _passwordHasher.VerifyPassword(dto.Password, _passwordHasher.HashPassword(dto.Password)))
+                   !_passwordHasher.VerifyPassword(dto.Password, user.Password))
                 {
                     _logger.LogWarning("DeleteUserUseCase failed: User not found or password mismatch.");
                     return null;
