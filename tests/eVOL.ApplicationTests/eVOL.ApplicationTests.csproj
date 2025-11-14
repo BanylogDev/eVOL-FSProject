@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\ChatGroupCases\" />
     <Folder Include="UseCases\SupportTicketCases\" />
   </ItemGroup>
 

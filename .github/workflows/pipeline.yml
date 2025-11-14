@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -25,14 +24,5 @@ jobs:
     - name: Build
       run: dotnet build eVOL.sln --no-restore --configuration Debug
 
-    - name: Test Domain
-      run: dotnet test tests/eVOL.DomainTests/eVOL.DomainTests.csproj --no-build
-
-    - name: Test Application
-      run: dotnet test tests/eVOL.ApplicationTests/eVOL.ApplicationTests.csproj --no-build
-
-    - name: Test Infrastructure
-      run: dotnet test tests/eVOL.InfrastructureTests/eVOL.InfrastructureTests.csproj --no-build
-
-    - name: Test API
-      run: dotnet test tests/eVOL.ApiTests/eVOL.ApiTests.csproj --no-build
+    - name: Test
+      run: dotnet test eVOL.sln --no-build --configuration Debug
