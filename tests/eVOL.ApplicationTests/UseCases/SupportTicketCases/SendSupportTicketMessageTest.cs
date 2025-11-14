@@ -7,27 +7,28 @@ using Xunit;
 using Moq;
 using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.Extensions.Logging;
-using eVOL.Application.UseCases.ChatGroupCases;
+using eVOL.Application.UseCases.SupportTicketCases;
 using eVOL.Domain.Entities;
 
 
-namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
+namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
 {
-    public class SendChatGroupMessageTest
+    public class SendSupportTicketMessageTest
     {
+
         [Fact]
-        public async Task SendChatGroupMessage_SendMessageToChatGroup_ReturnsChatMessageAndUser()
+        public async Task SendSupportTicketMessage_SendMessageSuccessfully_ReturnChatMessageAndUser()
         {
             // Arrange
 
             var uowMysqlMock = new Mock<IMySqlUnitOfWork>();
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
-            var chatGroupRepoMock = new Mock<IChatGroupRepository>();
+            var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var userRepoMock = new Mock<IUserRepository>();
             var messageRepoMock = new Mock<IMessageRepository>();
-            var loggerMock = new Mock<ILogger<SendChatGroupMessageUseCase>>();
+            var loggerMock = new Mock<ILogger<SendSupportTicketMessageUseCase>>();
 
-            uowMysqlMock.Setup(u => u.ChatGroup).Returns(chatGroupRepoMock.Object);
+            uowMysqlMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMongoMock.Setup(u => u.Message).Returns(messageRepoMock.Object);
@@ -43,37 +44,35 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
 
             var fakeUser = new User
             {
-                UserId = 1,
-                Name = "User"
+                UserId = 1, 
             };
 
-            var fakeChatGroup = new ChatGroup
+            var fakeSupportTicket = new SupportTicket
             {
                 Id = 1,
-                Name = "TestGroup"
+                Name = "Test Support Ticket"
             };
 
-            userRepoMock.Setup(u => u.GetUserById(It.IsAny<int>()))
-                .ReturnsAsync(fakeUser);
+            supportTicketRepoMock.Setup(s => s.GetSupportTicketByName("Test Support Ticket"))
+                .ReturnsAsync(fakeSupportTicket);
 
-            chatGroupRepoMock.Setup(c => c.GetChatGroupByName(It.IsAny<string>()))
-                .ReturnsAsync(fakeChatGroup);
+            userRepoMock.Setup(u => u.GetUserById(1))
+                .ReturnsAsync(fakeUser);
 
             messageRepoMock.Setup(m => m.AddChatMessageToDb(It.IsAny<ChatMessage>()));
 
-            var sut = new SendChatGroupMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendSupportTicketMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act
 
-            var (chatMessage, user) = await sut.ExecuteAsync("Test Message", "TestGroup", fakeUser.UserId);
+            var (chatMessage, user) = await sut.ExecuteAsync("Test Message", fakeSupportTicket.Name, fakeUser.UserId);
 
             // Assert
 
             Assert.NotNull(chatMessage);
             Assert.NotNull(user);
-            Assert.Equal("Test Message", chatMessage.Text);
-            Assert.Equal(fakeUser.UserId, chatMessage.SenderId);
-            Assert.Equal(fakeChatGroup.Id, chatMessage.ReceiverId);
+            Assert.Equal(fakeUser.UserId, user.UserId);
+            Assert.Equal(fakeUser.Name, user.Name);
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
             uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
@@ -84,26 +83,26 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Never);
             uowMongoMock.Verify(u => u.RollbackAsync(), Times.Never);
 
-            userRepoMock.Verify(u => u.GetUserById(It.IsAny<int>()), Times.Once);
+            supportTicketRepoMock.Verify(s => s.GetSupportTicketByName(It.IsAny<string>()), Times.Once);
 
-            chatGroupRepoMock.Verify(c => c.GetChatGroupByName(It.IsAny<string>()), Times.Once);
+            userRepoMock.Verify(u => u.GetUserById(1), Times.Once);
 
             messageRepoMock.Verify(m => m.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Once);
-
         }
 
         [Fact]
-        public async Task SendChatGroupMessage_ChatGroupOrUserNull_ReturnNull()
+        public async Task SendSupportTicketMessage_SupportTicketOrUserNull_ReturnNull()
         {
+
             // Arrange
 
             var uowMysqlMock = new Mock<IMySqlUnitOfWork>();
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
-            var chatGroupRepoMock = new Mock<IChatGroupRepository>();
+            var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var userRepoMock = new Mock<IUserRepository>();
-            var loggerMock = new Mock<ILogger<SendChatGroupMessageUseCase>>();
+            var loggerMock = new Mock<ILogger<SendSupportTicketMessageUseCase>>();
 
-            uowMysqlMock.Setup(u => u.ChatGroup).Returns(chatGroupRepoMock.Object);
+            uowMysqlMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -115,23 +114,17 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
             uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
-            var fakeUser = new User
-            {
-                UserId = 1,
-                Name = "User"
-            };
+            supportTicketRepoMock.Setup(s => s.GetSupportTicketByName("Test Support Ticket"))
+                .ReturnsAsync((SupportTicket?)null);
 
-            userRepoMock.Setup(u => u.GetUserById(It.IsAny<int>()))
+            userRepoMock.Setup(u => u.GetUserById(1))
                 .ReturnsAsync((User?)null);
 
-            chatGroupRepoMock.Setup(c => c.GetChatGroupByName(It.IsAny<string>()))
-                .ReturnsAsync((ChatGroup?)null);
-
-            var sut = new SendChatGroupMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendSupportTicketMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act
 
-            var (chatMessage, user) = await sut.ExecuteAsync("Test Message", "TestGroup", fakeUser.UserId);
+            var (chatMessage, user) = await sut.ExecuteAsync("Test Message", "Test Support Ticket", 1);
 
             // Assert
 
@@ -147,24 +140,23 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Never);
             uowMongoMock.Verify(u => u.RollbackAsync(), Times.Never);
 
-            chatGroupRepoMock.Verify(c => c.GetChatGroupByName(It.IsAny<string>()), Times.Once);
+            supportTicketRepoMock.Verify(s => s.GetSupportTicketByName(It.IsAny<string>()), Times.Once);
 
-            userRepoMock.Verify(u => u.GetUserById(It.IsAny<int>()), Times.Once);
-
-            uowMongoMock.Verify(m => m.Message.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Never);
+            userRepoMock.Verify(u => u.GetUserById(1), Times.Once);
         }
 
         [Fact]
-        public async Task SendChatGroupMessage_ThrowException_ReturnNothing()
+        public async Task SendSupportTicketMessage_ThrowException_ReturnNothing()
         {
             // Arrange
+
             var uowMysqlMock = new Mock<IMySqlUnitOfWork>();
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
-            var chatGroupRepoMock = new Mock<IChatGroupRepository>();
+            var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var userRepoMock = new Mock<IUserRepository>();
-            var loggerMock = new Mock<ILogger<SendChatGroupMessageUseCase>>();
+            var loggerMock = new Mock<ILogger<SendSupportTicketMessageUseCase>>();
 
-            uowMysqlMock.Setup(u => u.ChatGroup).Returns(chatGroupRepoMock.Object);
+            uowMysqlMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -176,14 +168,14 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
             uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
-            chatGroupRepoMock.Setup(c => c.GetChatGroupByName(It.IsAny<string>()))
+            supportTicketRepoMock.Setup(s => s.GetSupportTicketByName("Test Support Ticket"))
                 .ThrowsAsync(new Exception("Database error"));
 
-            var sut = new SendChatGroupMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendSupportTicketMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act & Assert
 
-            await Assert.ThrowsAsync<Exception>(() => sut.ExecuteAsync("Test Message", "TestGroup", 1));
+            await Assert.ThrowsAsync<Exception>(() => sut.ExecuteAsync("Test Message", "Test Support Ticket", 1));
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
             uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
@@ -194,11 +186,8 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Once);
             uowMongoMock.Verify(u => u.RollbackAsync(), Times.Once);
 
-            chatGroupRepoMock.Verify(c => c.GetChatGroupByName(It.IsAny<string>()), Times.Once);
-
-            userRepoMock.Verify(u => u.GetUserById(It.IsAny<int>()), Times.Never);
-
-            uowMongoMock.Verify(m => m.Message.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Never);
+            supportTicketRepoMock.Verify(s => s.GetSupportTicketByName(It.IsAny<string>()), Times.Once);
         }
+
     }
 }

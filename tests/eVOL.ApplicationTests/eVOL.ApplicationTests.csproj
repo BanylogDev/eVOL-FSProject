@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\SupportTicketCases\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\eVOL.Application\eVOL.Application.csproj" />
     <ProjectReference Include="..\..\src\eVOL.Domain\eVOL.Domain.csproj" />
     <ProjectReference Include="..\..\src\eVOL.Infrastructure\eVOL.Infrastructure.csproj" />

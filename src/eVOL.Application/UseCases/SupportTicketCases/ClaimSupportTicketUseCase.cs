@@ -14,9 +14,9 @@ namespace eVOL.Application.UseCases.SupportTicketCases
     public class ClaimSupportTicketUseCase : IClaimSupportTicketUseCase
     {
         private readonly IMySqlUnitOfWork _uow;
-        private readonly ILogger<ClaimSupportTicketDTO> _logger;
+        private readonly ILogger<ClaimSupportTicketUseCase> _logger;
 
-        public ClaimSupportTicketUseCase(IMySqlUnitOfWork uow, ILogger<ClaimSupportTicketDTO> logger)
+        public ClaimSupportTicketUseCase(IMySqlUnitOfWork uow, ILogger<ClaimSupportTicketUseCase> logger)
         {
             _uow = uow;
             _logger = logger;

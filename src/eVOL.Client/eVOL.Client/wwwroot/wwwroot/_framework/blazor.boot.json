@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "eVOL.Client.Client",
   "resources": {
-    "hash": "sha256-yh72BH51Iik6WYvbmrGifwEwCEDe37fwyNi8XaYL2MU=",
+    "hash": "sha256-12FVM/aZ2irzoik+Zyt703nsQ0b3hUK+tz8n9/Gm/B4=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-vtotCeXt2UD6oc459laJT32vBgigZ+eLoUmdeFkvYDk="
     },
@@ -80,7 +80,7 @@
       "System.Text.RegularExpressions.wasm": "sha256-WexwWc1FYuFQyf8KWUIY9RZiBfONzZ46NpmnjMUyKmU=",
       "netstandard.wasm": "sha256-KYp5VjI2jTfvfxDjkBnBAtf8w8+WCA/V6jC4Z/7JkBE=",
       "System.Private.CoreLib.wasm": "sha256-zQtI2CPo2yoq30mo/oU1Tg3DdWYEa+foyr9aDVvw0iE=",
-      "eVOL.Client.Client.wasm": "sha256-kzjDtR1W8LfxGOXa03uojtLOKLjNS+N89Q4xIaw8OhU="
+      "eVOL.Client.Client.wasm": "sha256-VB0mMfEEtsT4gRZrxjcqKo1IbZPKSakV97z3UiTeev8="
     }
   },
   "cacheBootResources": true,
