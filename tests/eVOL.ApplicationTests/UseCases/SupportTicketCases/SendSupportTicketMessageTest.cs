@@ -9,6 +9,7 @@ using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.Extensions.Logging;
 using eVOL.Application.UseCases.SupportTicketCases;
 using eVOL.Domain.Entities;
+using eVOL.Application.Messaging.Interfaces;
 
 
 namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
@@ -25,22 +26,17 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
             var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var userRepoMock = new Mock<IUserRepository>();
-            var messageRepoMock = new Mock<IMessageRepository>();
+            var rabbitMqMock = new Mock<IRabbitMqPublisher>();
             var loggerMock = new Mock<ILogger<SendSupportTicketMessageUseCase>>();
 
             uowMysqlMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
-            uowMongoMock.Setup(u => u.Message).Returns(messageRepoMock.Object);
-
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.BeginTransactionAsync()).Verifiable();
 
             uowMysqlMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
 
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
             var fakeUser = new User
             {
@@ -53,15 +49,24 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
                 Name = "Test Support Ticket"
             };
 
+            var Message = new ChatMessage
+            {
+                Text = "Test",
+                SenderId = 1,
+                ReceiverId = 1,
+                CreatedAt = DateTime.UtcNow,
+                MessageId = 1,
+            };
+
             supportTicketRepoMock.Setup(s => s.GetSupportTicketByName("Test Support Ticket"))
                 .ReturnsAsync(fakeSupportTicket);
 
             userRepoMock.Setup(u => u.GetUserById(1))
                 .ReturnsAsync(fakeUser);
 
-            messageRepoMock.Setup(m => m.AddChatMessageToDb(It.IsAny<ChatMessage>()));
+            rabbitMqMock.Setup(r => r.PublishAsync(Message));
 
-            var sut = new SendSupportTicketMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendSupportTicketMessageUseCase(rabbitMqMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act
 
@@ -75,19 +80,17 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             Assert.Equal(fakeUser.Name, user.Name);
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.CommitAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.CommitAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.RollbackAsync(), Times.Never);
 
             supportTicketRepoMock.Verify(s => s.GetSupportTicketByName(It.IsAny<string>()), Times.Once);
 
             userRepoMock.Verify(u => u.GetUserById(1), Times.Once);
 
-            messageRepoMock.Verify(m => m.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Once);
+            rabbitMqMock.Verify(r => r.PublishAsync(It.IsAny<ChatMessage>()), Times.Once);
+
         }
 
         [Fact]
@@ -100,19 +103,17 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
             var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var userRepoMock = new Mock<IUserRepository>();
+            var rabbitMqMock = new Mock<RabbitMqPublisher>();
             var loggerMock = new Mock<ILogger<SendSupportTicketMessageUseCase>>();
 
             uowMysqlMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.BeginTransactionAsync()).Verifiable();
 
             uowMysqlMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
 
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
             supportTicketRepoMock.Setup(s => s.GetSupportTicketByName("Test Support Ticket"))
                 .ReturnsAsync((SupportTicket?)null);
@@ -120,7 +121,7 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             userRepoMock.Setup(u => u.GetUserById(1))
                 .ReturnsAsync((User?)null);
 
-            var sut = new SendSupportTicketMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendSupportTicketMessageUseCase(rabbitMqMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act
 
@@ -132,13 +133,10 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             Assert.Null(user);
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.CommitAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.CommitAsync(), Times.Never);
 
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.RollbackAsync(), Times.Never);
 
             supportTicketRepoMock.Verify(s => s.GetSupportTicketByName(It.IsAny<string>()), Times.Once);
 
@@ -154,37 +152,33 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
             var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var userRepoMock = new Mock<IUserRepository>();
+            var rabbitMqMock = new Mock<RabbitMqPublisher>();
             var loggerMock = new Mock<ILogger<SendSupportTicketMessageUseCase>>();
 
             uowMysqlMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.BeginTransactionAsync()).Verifiable();
 
             uowMysqlMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
 
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
             supportTicketRepoMock.Setup(s => s.GetSupportTicketByName("Test Support Ticket"))
                 .ThrowsAsync(new Exception("Database error"));
 
-            var sut = new SendSupportTicketMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+
+            var sut = new SendSupportTicketMessageUseCase(rabbitMqMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act & Assert
 
             await Assert.ThrowsAsync<Exception>(() => sut.ExecuteAsync("Test Message", "Test Support Ticket", 1));
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.CommitAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.CommitAsync(), Times.Never);
 
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.RollbackAsync(), Times.Once);
 
             supportTicketRepoMock.Verify(s => s.GetSupportTicketByName(It.IsAny<string>()), Times.Once);
         }

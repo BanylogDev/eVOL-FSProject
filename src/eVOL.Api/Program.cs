@@ -1,6 +1,7 @@
 using AutoMapper;
 using eVOL.API.Hubs;
 using eVOL.Application.Mappings;
+using eVOL.Application.Messaging.Interfaces;
 using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.AdminCases;
 using eVOL.Application.UseCases.ChatGroupCases;
@@ -122,6 +123,10 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAesService, AesService>();
+
+// Messaging
+
+builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
 
 // Admin Use Cases
 

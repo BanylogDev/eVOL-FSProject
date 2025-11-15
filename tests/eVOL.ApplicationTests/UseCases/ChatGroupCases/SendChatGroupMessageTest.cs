@@ -9,6 +9,7 @@ using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.Extensions.Logging;
 using eVOL.Application.UseCases.ChatGroupCases;
 using eVOL.Domain.Entities;
+using eVOL.Application.Messaging.Interfaces;
 
 
 namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
@@ -24,22 +25,17 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
             var chatGroupRepoMock = new Mock<IChatGroupRepository>();
             var userRepoMock = new Mock<IUserRepository>();
-            var messageRepoMock = new Mock<IMessageRepository>();
+            var rabbitMqMock = new Mock<IRabbitMqPublisher>();
             var loggerMock = new Mock<ILogger<SendChatGroupMessageUseCase>>();
 
             uowMysqlMock.Setup(u => u.ChatGroup).Returns(chatGroupRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
-            uowMongoMock.Setup(u => u.Message).Returns(messageRepoMock.Object);
-
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.BeginTransactionAsync()).Verifiable();
 
             uowMysqlMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
 
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
             var fakeUser = new User
             {
@@ -53,15 +49,24 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
                 Name = "TestGroup"
             };
 
+            var Message = new ChatMessage
+            {
+                Text = "Test",
+                SenderId = 1,
+                ReceiverId = 1,
+                CreatedAt = DateTime.UtcNow,
+                MessageId = 1,
+            };
+
             userRepoMock.Setup(u => u.GetUserById(It.IsAny<int>()))
                 .ReturnsAsync(fakeUser);
 
             chatGroupRepoMock.Setup(c => c.GetChatGroupByName(It.IsAny<string>()))
                 .ReturnsAsync(fakeChatGroup);
 
-            messageRepoMock.Setup(m => m.AddChatMessageToDb(It.IsAny<ChatMessage>()));
+            rabbitMqMock.Setup(r => r.PublishAsync(Message));
 
-            var sut = new SendChatGroupMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendChatGroupMessageUseCase(rabbitMqMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act
 
@@ -76,19 +81,16 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             Assert.Equal(fakeChatGroup.Id, chatMessage.ReceiverId);
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.CommitAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.CommitAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.RollbackAsync(), Times.Never);
 
             userRepoMock.Verify(u => u.GetUserById(It.IsAny<int>()), Times.Once);
 
             chatGroupRepoMock.Verify(c => c.GetChatGroupByName(It.IsAny<string>()), Times.Once);
 
-            messageRepoMock.Verify(m => m.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Once);
+            rabbitMqMock.Verify(r => r.PublishAsync(It.IsAny<ChatMessage>()), Times.Once);
 
         }
 
@@ -101,19 +103,17 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
             var chatGroupRepoMock = new Mock<IChatGroupRepository>();
             var userRepoMock = new Mock<IUserRepository>();
+            var rabbitMqMock = new Mock<IRabbitMqPublisher>();
             var loggerMock = new Mock<ILogger<SendChatGroupMessageUseCase>>();
 
             uowMysqlMock.Setup(u => u.ChatGroup).Returns(chatGroupRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.BeginTransactionAsync()).Verifiable();
 
             uowMysqlMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
 
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
             var fakeUser = new User
             {
@@ -127,7 +127,7 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             chatGroupRepoMock.Setup(c => c.GetChatGroupByName(It.IsAny<string>()))
                 .ReturnsAsync((ChatGroup?)null);
 
-            var sut = new SendChatGroupMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendChatGroupMessageUseCase(rabbitMqMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act
 
@@ -139,19 +139,16 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             Assert.Null(user);
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.CommitAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.CommitAsync(), Times.Never);
 
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.RollbackAsync(), Times.Never);
 
             chatGroupRepoMock.Verify(c => c.GetChatGroupByName(It.IsAny<string>()), Times.Once);
 
             userRepoMock.Verify(u => u.GetUserById(It.IsAny<int>()), Times.Once);
 
-            uowMongoMock.Verify(m => m.Message.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Never);
+            rabbitMqMock.Verify(r => r.PublishAsync(It.IsAny<ChatMessage>()), Times.Never);
         }
 
         [Fact]
@@ -162,43 +159,38 @@ namespace eVOL.ApplicationTests.UseCases.ChatGroupCases
             var uowMongoMock = new Mock<IMongoUnitOfWork>();
             var chatGroupRepoMock = new Mock<IChatGroupRepository>();
             var userRepoMock = new Mock<IUserRepository>();
+            var rabbitMqMock = new Mock<IRabbitMqPublisher>();
             var loggerMock = new Mock<ILogger<SendChatGroupMessageUseCase>>();
 
             uowMysqlMock.Setup(u => u.ChatGroup).Returns(chatGroupRepoMock.Object);
             uowMysqlMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMysqlMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.BeginTransactionAsync()).Verifiable();
 
             uowMysqlMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
 
             uowMysqlMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
-            uowMongoMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
             chatGroupRepoMock.Setup(c => c.GetChatGroupByName(It.IsAny<string>()))
                 .ThrowsAsync(new Exception("Database error"));
 
-            var sut = new SendChatGroupMessageUseCase(uowMongoMock.Object, uowMysqlMock.Object, loggerMock.Object);
+            var sut = new SendChatGroupMessageUseCase(rabbitMqMock.Object, uowMysqlMock.Object, loggerMock.Object);
 
             // Act & Assert
 
             await Assert.ThrowsAsync<Exception>(() => sut.ExecuteAsync("Test Message", "TestGroup", 1));
 
             uowMysqlMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
             uowMysqlMock.Verify(u => u.CommitAsync(), Times.Never);
-            uowMongoMock.Verify(u => u.CommitAsync(), Times.Never);
 
             uowMysqlMock.Verify(u => u.RollbackAsync(), Times.Once);
-            uowMongoMock.Verify(u => u.RollbackAsync(), Times.Once);
 
             chatGroupRepoMock.Verify(c => c.GetChatGroupByName(It.IsAny<string>()), Times.Once);
 
             userRepoMock.Verify(u => u.GetUserById(It.IsAny<int>()), Times.Never);
 
-            uowMongoMock.Verify(m => m.Message.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Never);
+            rabbitMqMock.Verify(r => r.PublishAsync(It.IsAny<ChatMessage>()), Times.Never);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
+﻿using eVOL.Application.Messaging.Interfaces;
+using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
 using eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases;
 using eVOL.Domain.Entities;
 using eVOL.Domain.RepositoriesInteraces;
@@ -14,13 +15,13 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 {
     public class SendSupportTicketMessageUseCase : ISendSupportTicketMessageUseCase
     {
-        private readonly IMongoUnitOfWork _mongouow;
+        private readonly IRabbitMqPublisher _publisher;
         private readonly IMySqlUnitOfWork _mysqluow;
         private readonly ILogger<SendSupportTicketMessageUseCase> _logger;
 
-        public SendSupportTicketMessageUseCase(IMongoUnitOfWork mongouow, IMySqlUnitOfWork mysqluow, ILogger<SendSupportTicketMessageUseCase> logger)
+        public SendSupportTicketMessageUseCase(IRabbitMqPublisher publisher, IMySqlUnitOfWork mysqluow, ILogger<SendSupportTicketMessageUseCase> logger)
         {
-            _mongouow = mongouow;
+            _publisher = publisher;
             _mysqluow = mysqluow;
             _logger = logger;
         }
@@ -30,7 +31,6 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 
             _logger.LogInformation("Started sending message from user with id: {UserId} to support ticket with name: {SupportTicketName}, Text: {Text}", userId, supportTicketName, message);
 
-            _mongouow.BeginTransactionAsync();
             await _mysqluow.BeginTransactionAsync();
 
             try
@@ -56,11 +56,10 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 
                 _logger.LogInformation("Adding custom message to mongo database!");
 
-                await _mongouow.Message.AddChatMessageToDb(newMessage);
+                await _publisher.PublishAsync(newMessage);
 
                 _logger.LogInformation("Finished adding custom message to mongo database!");
 
-                await _mongouow.CommitAsync();
                 await _mysqluow.CommitAsync();
 
                 _logger.LogInformation("Ended sending message from user with id: {UserId} to support ticket with name: {SupportTicketName}, Text: {Text}, Success!", userId, supportTicketName, message);
@@ -69,7 +68,6 @@ namespace eVOL.Application.UseCases.SupportTicketCases
             }
             catch (Exception ex)
             {
-                await _mongouow.RollbackAsync();
                 await _mysqluow.RollbackAsync();
                 _logger.LogError(ex, "Error, Something went wrong while sending message to support ticket with name: {SupportTicketName}", supportTicketName);
                 throw;

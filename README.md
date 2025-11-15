@@ -13,7 +13,7 @@ A modern **backend chat messaging application** built with .NET 10,
 - **User profiles and more in MySQL**
 - **Chat messages in MongoDB**
 - **Unit Testing using xUnit**
-- Future-ready: RabbitMQ support for messaging queue
+- **RabbitMQ support for messaging queue**
 - **Scalable API layer** with multiple instances behind **NGINX load balancer**
 - **Containerized services** managed with **Docker Compose**
 

@@ -155,6 +155,12 @@ services:
       - evol-network
     restart: unless-stopped
 
+  evol.rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
 
 volumes:
   evol-mysql-data:
