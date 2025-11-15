@@ -1,3 +1,4 @@
+using AutoMapper;
 using eVOL.API.Hubs;
 using eVOL.Application.Mappings;
 using eVOL.Application.ServicesInterfaces;
@@ -94,39 +95,6 @@ IssuerSigningKey = new SymmetricSecurityKey(
 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-{
-    Title = "Zelta",
-    Version = "v1"
-});
-
-options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-{
-    Name = "Authorization",
-    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-    Scheme = "Bearer",
-    BearerFormat = "JWT",
-    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-    Description = "Enter 'Bearer' [space] and then your valid token.\n\nExample: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...'"
-});
-
-options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
 
 var redisConnection = builder.Configuration["CacheSettings:RedisConnection"];
 builder.Services.AddSignalR().AddStackExchangeRedis(redisConnection, opts =>
@@ -146,8 +114,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
-
+builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
 
 // Services
 

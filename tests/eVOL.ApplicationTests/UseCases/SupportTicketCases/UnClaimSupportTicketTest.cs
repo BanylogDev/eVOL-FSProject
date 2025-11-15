@@ -180,6 +180,7 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
         public async Task UnClaimSupportTicket_ThrowException_ReturnNothing()
         {
             // Arrange
+
             var uowMock = new Mock<IMySqlUnitOfWork>();
             var userRepoMock = new Mock<IUserRepository>();
             var supportTicketRepoMock = new Mock<ISupportTicketRepository>();

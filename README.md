@@ -1,6 +1,6 @@
 ﻿# eVOL - Advanced Chat Messaging App
 
-A modern **backend chat messaging application** built with .NET 8,
+A modern **backend chat messaging application** built with .NET 10,
 
 ---
 
@@ -23,7 +23,7 @@ A modern **backend chat messaging application** built with .NET 8,
 
 | Layer            | Technology                                               |
 |------------------|----------------------------------------------------------|
-| Backend           | .NET 8, ASP.NET Core Web API, Clean Architecture        |
+| Backend           | .NET 10, ASP.NET Core Web API, Clean Architecture        |
 | Database          | MySQL (users), MongoDB (chat messages)                  |
 | Caching           | Redis                                                    |
 | Security          | JWT Tokens, AES Encryption, BCrypt Hashing              |
