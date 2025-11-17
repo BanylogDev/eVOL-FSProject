@@ -31,6 +31,7 @@ A modern **backend chat messaging application** built with .NET 10,
 | Message Brokler   | RabbitMQ                                |
 | Load Balancing    | NGINX (reverse proxy for multiple API instances)        |
 | Logging           | Serilog - Seq                                            |
+| Mapping           | Mapster
 | Unit Testing      | xUnit                                                    |
 | Containerization  | Docker, Docker Compose                                   |
 | CI/CD             | GitHub Actions Pipeline                                  |

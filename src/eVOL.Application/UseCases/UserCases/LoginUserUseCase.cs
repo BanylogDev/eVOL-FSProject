@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using eVOL.Application.DTOs;
 using eVOL.Application.DTOs.Responses;
 using eVOL.Application.DTOs.Responses.User;
@@ -23,22 +23,19 @@ namespace eVOL.Application.UseCases.UserCases
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _config;
         private readonly ILogger<LoginUserUseCase> _logger;
-        private readonly IMapper _mapper;
 
 
         public LoginUserUseCase(IMySqlUnitOfWork uow, 
             IPasswordHasher passwordHasher, 
             IJwtService jwtService, 
             IConfiguration config, 
-            ILogger<LoginUserUseCase> logger, 
-            IMapper mapper)
+            ILogger<LoginUserUseCase> logger)
         {
             _uow = uow;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
             _config = config;
             _logger = logger;
-            _mapper = mapper;
         }
 
         public async Task<LoginUserResponse?> ExecuteAsync(LoginDTO dto)
@@ -75,7 +72,7 @@ namespace eVOL.Application.UseCases.UserCases
 
                 _logger.LogInformation($"handled by {Environment.MachineName}");
 
-                return _mapper.Map<LoginUserResponse>(user);
+                return user.Adapt<LoginUserResponse>();
             }
             catch (Exception ex)
             {

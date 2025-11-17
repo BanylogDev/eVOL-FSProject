@@ -50,5 +50,6 @@ namespace eVOL.WorkersTests
 
             uowMock.Verify(u => u.Message.AddChatMessageToDb(It.IsAny<ChatMessage>()), Times.Once);
         }
+
     }
 }

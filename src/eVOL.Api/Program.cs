@@ -1,4 +1,5 @@
-using AutoMapper;
+using Mapster;
+using MapsterMapper;
 using eVOL.API.Hubs;
 using eVOL.Application.Mappings;
 using eVOL.Application.Messaging.Interfaces;
@@ -115,7 +116,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile).Assembly);
+var config = new TypeAdapterConfig();
+config.Scan(typeof(UserMappings).Assembly);
+
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 // Services
 

@@ -10,7 +10,7 @@ using eVOL.Application.ServicesInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using eVOL.Application.UseCases.UserCases;
-using AutoMapper;
+using Mapster;
 using eVOL.Domain.Entities;
 using eVOL.Application.DTOs.Responses.User;
 using eVOL.Application.DTOs;
@@ -31,7 +31,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<LoginUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
 
@@ -54,21 +53,12 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             jwtServiceMock.Setup(j => j.GenerateJwtToken(fakeUser, It.IsAny<IConfiguration>())).Returns("accessToken");
             jwtServiceMock.Setup(j => j.GenerateRefreshToken()).Returns("refresh");
 
-            mapperMock.Setup(m => m.Map<LoginUserResponse>(fakeUser)).Returns(new LoginUserResponse
-            {
-                UserId = fakeUser.UserId,
-                Email = fakeUser.Email,
-                Name = fakeUser.Name,
-                AccessToken = "accessToken",
-            });
-
             var sut = new LoginUserUseCase(
                 uowMock.Object,
                 passwordHasherMock.Object,
                 jwtServiceMock.Object,
                 configMock.Object,
-                loggerMock.Object,
-                mapperMock.Object
+                loggerMock.Object
             );
 
             // Act
@@ -96,8 +86,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             jwtServiceMock.Verify(j => j.GenerateJwtToken(fakeUser, It.IsAny<IConfiguration>()), Times.Once);
             jwtServiceMock.Verify(j => j.GenerateRefreshToken(), Times.Once);
 
-            mapperMock.Verify(m => m.Map<LoginUserResponse>(fakeUser), Times.Once);
-
         }
 
         [Fact] 
@@ -111,7 +99,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<LoginUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -123,8 +110,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 passwordHasherMock.Object,
                 jwtServiceMock.Object,
                 configMock.Object,
-                loggerMock.Object,
-                mapperMock.Object
+                loggerMock.Object
             );
 
             // Act
@@ -155,7 +141,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<LoginUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -169,8 +154,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 passwordHasherMock.Object,
                 jwtServiceMock.Object,
                 configMock.Object,
-                loggerMock.Object,
-                mapperMock.Object
+                loggerMock.Object
             );
 
             // Act & Assert

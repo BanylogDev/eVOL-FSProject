@@ -9,7 +9,7 @@ using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.Extensions.Logging;
 using eVOL.Application.UseCases.UserCases;
 using eVOL.Domain.Entities;
-using AutoMapper;
+using Mapster;
 using eVOL.Application.DTOs.Responses.User;
 
 namespace eVOL.ApplicationTests.UseCases.UserCases
@@ -24,7 +24,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var uowMock = new Mock<IMySqlUnitOfWork>();
             var userRepoMock = new Mock<IUserRepository>();
             var loggerMock = new Mock<ILogger<GetUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
@@ -35,14 +34,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
 
             userRepoMock.Setup(u => u.GetUserById(1)).ReturnsAsync(fakeUser);
 
-            var mappedResponse = new GetUserResponse
-            {
-                UserId = fakeUser.UserId
-            };
-
-            mapperMock.Setup(m => m.Map<GetUserResponse>(fakeUser)).Returns(mappedResponse);
-
-            var sut = new GetUserUseCase(uowMock.Object, loggerMock.Object, mapperMock.Object);
+            var sut = new GetUserUseCase(uowMock.Object, loggerMock.Object);
 
             //Act
 
@@ -65,13 +57,12 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var uowMock = new Mock<IMySqlUnitOfWork>();
             var userRepoMock = new Mock<IUserRepository>();
             var loggerMock = new Mock<ILogger<GetUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             userRepoMock.Setup(u => u.GetUserById(1)).ReturnsAsync((User?)null);
 
-            var sut = new GetUserUseCase(uowMock.Object, loggerMock.Object, mapperMock.Object);
+            var sut = new GetUserUseCase(uowMock.Object, loggerMock.Object);
 
             //Act
 

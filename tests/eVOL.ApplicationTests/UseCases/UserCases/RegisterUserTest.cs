@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using eVOL.Domain.RepositoriesInteraces;
-using AutoMapper;
+using Mapster;
 using Microsoft.Extensions.Logging;
 using eVOL.Application.UseCases.UserCases;
 using eVOL.Application.ServicesInterfaces;
@@ -21,7 +21,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
     {
 
         [Fact]
-        public async Task RegisterUser_RegisterUser_ReturnsMappedRegisterResponseOfUser()
+        public async Task RegisterUser_RegisterUser_ReturnsUser()
         {
             // Arrange
 
@@ -29,7 +29,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var authRepoMock = new Mock<IAuthRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var loggerMock = new Mock<ILogger<RegisterUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -66,20 +65,10 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
 
             passwordHasherMock.Setup(p => p.HashPassword("password")).Returns("hashedPassword");
 
-            mapperMock.Setup(m => m.Map<RegisterUserResponse>(It.IsAny<User>()))
-                      .Returns(new RegisterUserResponse
-                      {
-                          UserId = 1,
-                          Name = "username",
-                          Email = "email"
-                      });
-
-
             var sut = new RegisterUserUseCase(
                 uowMock.Object,
                 passwordHasherMock.Object,
-                loggerMock.Object,
-                mapperMock.Object
+                loggerMock.Object
             );
 
             // Act
@@ -89,7 +78,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Assert
 
             Assert.NotNull(result);
-            Assert.Equal(fakeUser.UserId, result.UserId);
             Assert.Equal(fakeUser.Name, result.Name);
             Assert.Equal(fakeUser.Email, result.Email);
 
@@ -114,7 +102,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var authRepoMock = new Mock<IAuthRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var loggerMock = new Mock<ILogger<RegisterUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -140,8 +127,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var sut = new RegisterUserUseCase(
                 uowMock.Object,
                 passwordHasherMock.Object,
-                loggerMock.Object,
-                mapperMock.Object
+                loggerMock.Object
             );
 
             // Act
@@ -167,7 +153,6 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var authRepoMock = new Mock<IAuthRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var loggerMock = new Mock<ILogger<RegisterUserUseCase>>();
-            var mapperMock = new Mock<IMapper>();
 
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
@@ -193,8 +178,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             var sut = new RegisterUserUseCase(
                 uowMock.Object,
                 passwordHasherMock.Object,
-                loggerMock.Object,
-                mapperMock.Object
+                loggerMock.Object
             );
 
             // Act & Assert
