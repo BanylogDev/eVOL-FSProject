@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class ClaimSupportTicketDTO
+    public sealed class ClaimSupportTicketDTO
     {
         [Required] 
         public int Id { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs
 {
-    public class LoginDTO
+    public sealed class LoginDTO
     {
         [Required]
         [EmailAddress]

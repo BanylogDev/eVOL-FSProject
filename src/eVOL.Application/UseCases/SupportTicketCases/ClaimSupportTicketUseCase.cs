@@ -42,7 +42,8 @@ namespace eVOL.Application.UseCases.SupportTicketCases
                 }
 
                 _logger.LogInformation("Claiming SupportTicket ID: {SupportTicketId} by User ID: {UserId}", dto.Id, dto.OpenedBy);
-                supportTicket.ClaimedBy = dto.OpenedBy;
+                supportTicket.ClaimedById = dto.OpenedBy;
+                supportTicket.ClaimedBy = user;
                 supportTicket.ClaimedStatus = true;
                 _logger.LogInformation("SupportTicket ID: {SupportTicketId} successfully claimed by User ID: {UserId}", dto.Id, dto.OpenedBy);
 

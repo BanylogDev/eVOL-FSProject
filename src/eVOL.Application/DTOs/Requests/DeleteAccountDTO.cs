@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class DeleteAccountDTO
+    public sealed class DeleteAccountDTO
     {
         [Required]
         public int Id { get; set; }

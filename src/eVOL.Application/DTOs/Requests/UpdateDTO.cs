@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class UpdateDTO
+    public sealed class UpdateDTO
     {
         [Required]
         public int Id { get; set; }

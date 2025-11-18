@@ -43,8 +43,9 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             {
                 Id = 1,
                 ClaimedStatus = true,
-                ClaimedBy = 1,
-                OpenedBy = 2,
+                ClaimedById = 1,
+                OpenedById = 2,
+                ClaimedBy = fakeUser,
             };
 
             userRepoMock.Setup(r => r.GetUserById(It.IsAny<int>())).ReturnsAsync(fakeUser);
@@ -66,7 +67,7 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             Assert.NotNull(result);
             Assert.Equal(fakeUser.UserId, result.UserId);
             Assert.False(fakeSupportTicket.ClaimedStatus);
-            Assert.NotEqual(fakeUser.UserId, fakeSupportTicket.ClaimedBy);
+            Assert.NotEqual(fakeUser.UserId, fakeSupportTicket.ClaimedById);
 
             uowMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
             uowMock.Verify(u => u.CommitAsync(), Times.Once);
@@ -145,8 +146,9 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             {
                 Id = 1,
                 ClaimedStatus = false,
-                ClaimedBy = 2,
-                OpenedBy = 1,
+                ClaimedById = 2,
+                OpenedById = 1,
+                OpenedBy = fakeUser,
             };
 
             userRepoMock.Setup(r => r.GetUserById(It.IsAny<int>())).ReturnsAsync(fakeUser);

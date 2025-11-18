@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class TokenDTO
+    public sealed class TokenDTO
     {
         [Required]
         public string AccessToken { get; set; } = string.Empty;

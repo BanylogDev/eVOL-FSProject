@@ -10,6 +10,6 @@ namespace eVOL.Application.UseCases.UCInterfaces.ISupportTicketCases
 {
     public interface ICreateSupportTicketUseCase
     {
-        Task<SupportTicket> ExecuteAsync(SupportTicketDTO dto);
+        Task<SupportTicket?> ExecuteAsync(SupportTicketDTO dto);
     }
 }

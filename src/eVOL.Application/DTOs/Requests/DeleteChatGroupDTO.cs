@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs
 {
-    public class DeleteChatGroupDTO
+    public sealed class DeleteChatGroupDTO
     {
         [Required]
         public int ChatGroupId { get; set; }

@@ -43,7 +43,8 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 
                 _logger.LogInformation("Unclaiming SupportTicket ID: {SupportTicketId} by User ID: {UserId}", dto.Id, dto.OpenedBy);
 
-                supportTicket.ClaimedBy = 0;
+                supportTicket.ClaimedById = 0;
+                supportTicket.ClaimedBy = user;
                 supportTicket.ClaimedStatus = false;
 
                 _logger.LogInformation("SupportTicket ID: {SupportTicketId} successfully unclaimed by User ID: {UserId}", dto.Id, dto.OpenedBy);

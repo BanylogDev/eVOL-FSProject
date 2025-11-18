@@ -22,7 +22,7 @@ namespace eVOL.Application.UseCases.SupportTicketCases
             _logger = logger;
         }
 
-        public async Task<SupportTicket> ExecuteAsync(SupportTicketDTO dto)
+        public async Task<SupportTicket?> ExecuteAsync(SupportTicketDTO dto)
         {
 
             _logger.LogInformation("Starting CreateSupportTicketUseCase for User ID: {UserId}", dto.OpenedBy);
@@ -31,12 +31,21 @@ namespace eVOL.Application.UseCases.SupportTicketCases
 
             try
             {
+
+                var user = await _uow.Users.GetUserById(dto.OpenedBy);
+
+                if (user == null)
+                {
+                    return null;
+                }
+
                 var newSupportTicket = new SupportTicket()
                 {
                     Category = dto.Category,
                     Text = dto.Text,
-                    OpenedBy = dto.OpenedBy,
-                    ClaimedBy = 0,
+                    OpenedById = dto.OpenedBy,
+                    ClaimedById = 0,
+                    OpenedBy = user,
                     CreatedAt = DateTime.UtcNow
 
                 };

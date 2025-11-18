@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Responses.User
 {
-    public class GetUserResponse : BaseUserResponse
+    public sealed class GetUserResponse : BaseUserResponse
     {
         public Address Address { get; set; }
         public Money Money { get; set; }

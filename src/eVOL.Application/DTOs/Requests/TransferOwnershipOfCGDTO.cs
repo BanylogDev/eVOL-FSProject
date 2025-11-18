@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class TransferOwnershipOfCGDTO
+    public sealed class TransferOwnershipOfCGDTO
     {
         [Required]
         public int ChatGroupId { get; set; }

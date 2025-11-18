@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class RegisterDTO
+    public sealed class RegisterDTO
     {
         [Required]
         [StringLength(12, MinimumLength = 4)]

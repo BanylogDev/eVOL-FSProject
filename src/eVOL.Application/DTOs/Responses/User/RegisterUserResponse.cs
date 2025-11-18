@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Responses.User
 {
-    public class RegisterUserResponse : BaseUserResponse
+    public sealed class RegisterUserResponse : BaseUserResponse
     {   
         public DateTime CreatedAt { get; set; }
     }

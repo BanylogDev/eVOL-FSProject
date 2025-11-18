@@ -32,6 +32,13 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
+            var fakeUser = new User
+            {
+                UserId = 1,
+            };
+
+            uowMock.Setup(u => u.Users.GetUserById(It.IsAny<int>())).ReturnsAsync(fakeUser);
+
             supportTicketRepoMock.Setup(r => r.CreateSupportTicket(It.IsAny<SupportTicket>()));
 
             var sut = new CreateSupportTicketUseCase(uowMock.Object, loggerMock.Object);
@@ -61,17 +68,14 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
         {
             // Arrange
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var supportTicketRepoMock = new Mock<ISupportTicketRepository>();
             var loggerMock = new Mock<ILogger<CreateSupportTicketUseCase>>();
 
-            uowMock.Setup(u => u.SupportTicket).Returns(supportTicketRepoMock.Object);
 
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
-            supportTicketRepoMock.Setup(r => r.CreateSupportTicket(It.IsAny<SupportTicket>()))
-                .ThrowsAsync(new Exception("Database error"));
+            uowMock.Setup(u => u.Users.GetUserById(It.IsAny<int>())).ThrowsAsync(new Exception("Database error"));
 
             var sut = new CreateSupportTicketUseCase(uowMock.Object, loggerMock.Object);
 
@@ -90,7 +94,7 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
             uowMock.Verify(u => u.CommitAsync(), Times.Never);
             uowMock.Verify(u => u.RollbackAsync(), Times.Once);
 
-            supportTicketRepoMock.Verify(r => r.CreateSupportTicket(It.IsAny<SupportTicket>()), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserById(It.IsAny<int>()), Times.Once);
 
         }
 

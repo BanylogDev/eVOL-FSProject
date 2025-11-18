@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class ChatGroupDTO
+    public sealed class ChatGroupDTO
     {
         [Required]
         public string Name { get; set; } = string.Empty;

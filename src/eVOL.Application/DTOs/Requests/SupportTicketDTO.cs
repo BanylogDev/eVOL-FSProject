@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace eVOL.Application.DTOs.Requests
 {
-    public class SupportTicketDTO
+    public sealed class SupportTicketDTO
     {
         [Required]
         public string Category { get; set; } = string.Empty;

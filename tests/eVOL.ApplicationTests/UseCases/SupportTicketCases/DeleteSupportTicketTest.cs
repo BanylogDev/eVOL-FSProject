@@ -35,7 +35,7 @@ namespace eVOL.ApplicationTests.UseCases.SupportTicketCases
                 Id = 1,
                 Category = "Test",
                 Text = "Test Message",
-                OpenedBy = 1
+                OpenedById = 1
             };
 
             supportTicketRepoMock.Setup(r => r.GetSupportTicketById(1)).ReturnsAsync(fakeSupportTicket);
