@@ -26,11 +26,14 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
+            var userRepoMock = new Mock<IUserRepository>();
             var authRepoMock = new Mock<IAuthRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var loggerMock = new Mock<ILogger<RegisterUserUseCase>>();
 
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
             uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
@@ -57,11 +60,10 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 PhoneNumber = "1234567890"
             };
 
-            authRepoMock.Setup(u => u.GetUserByName("username")).ReturnsAsync((User?)null);
-            authRepoMock.Setup(u => u.GetUserByEmail("email")).ReturnsAsync((User?)null);
+            uowMock.Setup(u => u.Users.GetUserByName(It.IsAny<string>())).ReturnsAsync((User?)null);
+            uowMock.Setup(u => u.Users.GetUserByEmail(It.IsAny<string>())).ReturnsAsync((User?)null);
 
-            authRepoMock.Setup(a => a.Register(It.IsAny<User>()))
-                .ReturnsAsync(fakeUser);
+            uowMock.Setup(u => u.Auth.Register(It.IsAny<User>())).ReturnsAsync(fakeUser);
 
             passwordHasherMock.Setup(p => p.HashPassword("password")).Returns("hashedPassword");
 
@@ -85,9 +87,10 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             uowMock.Verify(u => u.CommitAsync(), Times.Once);
             uowMock.Verify(u => u.RollbackAsync(), Times.Never);
 
-            authRepoMock.Verify(a => a.GetUserByName("username"), Times.Once);
-            authRepoMock.Verify(a => a.GetUserByEmail("email"), Times.Once);
-            authRepoMock.Verify(a => a.Register(It.IsAny<User>()), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByName(It.IsAny<string>()), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByEmail(It.IsAny<string>()), Times.Once);
+
+            uowMock.Verify(u => u.Auth.Register(It.IsAny<User>()), Times.Once);
 
             passwordHasherMock.Verify(p => p.HashPassword("password"), Times.Once);
 
@@ -99,11 +102,12 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             //Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
+            var userRepoMock = new Mock<IUserRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var loggerMock = new Mock<ILogger<RegisterUserUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
+
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
@@ -122,7 +126,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 PhoneNumber = "1234567890"
             };
 
-            authRepoMock.Setup(u => u.GetUserByName("username")).ReturnsAsync(new User { });
+            uowMock.Setup(u => u.Users.GetUserByName(It.IsAny<string>())).ReturnsAsync(new User { });
 
             var sut = new RegisterUserUseCase(
                 uowMock.Object,
@@ -141,7 +145,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             uowMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
             uowMock.Verify(u => u.CommitAsync(), Times.Never);
 
-            authRepoMock.Verify(a => a.GetUserByName("username"), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByName(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -150,11 +154,12 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             //Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
+            var userRepoMock = new Mock<IUserRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var loggerMock = new Mock<ILogger<RegisterUserUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
+
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
@@ -173,7 +178,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 PhoneNumber = "1234567890"
             };
 
-            authRepoMock.Setup(u => u.GetUserByName("username")).ThrowsAsync(new Exception("Database error"));
+            uowMock.Setup(u => u.Users.GetUserByName(It.IsAny<string>())).ThrowsAsync(new Exception("Database error"));
 
             var sut = new RegisterUserUseCase(
                 uowMock.Object,
@@ -189,7 +194,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             uowMock.Verify(u => u.CommitAsync(), Times.Never);
             uowMock.Verify(u => u.RollbackAsync(), Times.Once);
 
-            authRepoMock.Verify(a => a.GetUserByName("username"), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByName(It.IsAny<string>()), Times.Once);
         }
     }
 }

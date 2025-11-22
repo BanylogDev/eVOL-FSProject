@@ -20,7 +20,8 @@ namespace eVOL.Domain.Entities
         public DateTime CreatedAt { get; set; }
 
         public ICollection<ChatGroup> ChatGroups { get; set; } = new List<ChatGroup>();
-        public ICollection<SupportTicket> SupportTickets { get; set; } = new List<SupportTicket>();
+        public ICollection<SupportTicket> OpenedTickets { get; set; } = new List<SupportTicket>();
+        public ICollection<SupportTicket> ClaimedTickets { get; set; } = new List<SupportTicket>();
 
         public string AccessToken { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;

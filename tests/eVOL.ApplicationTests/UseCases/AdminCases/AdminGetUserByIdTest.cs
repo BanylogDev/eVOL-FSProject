@@ -22,7 +22,7 @@ namespace eVOL.ApplicationTests.UseCases.AdminCases
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
             var userRepoMock = new Mock<IUserRepository>();
-            var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<AdminGetUserUseCase>>();
+            var loggerMock = new Mock<ILogger<AdminGetUserUseCase>>();
 
             uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 

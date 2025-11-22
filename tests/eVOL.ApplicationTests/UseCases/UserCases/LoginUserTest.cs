@@ -26,13 +26,13 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
+            var userRepoMock = new Mock<IUserRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<LoginUserUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
 
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
@@ -46,7 +46,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 Password = "hashedPassword"
             };
 
-            authRepoMock.Setup(u => u.GetUserByEmail("email")).ReturnsAsync(fakeUser);
+            uowMock.Setup(u => u.Users.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(fakeUser);
 
             passwordHasherMock.Setup(p => p.VerifyPassword("password", "hashedPassword")).Returns(true);
 
@@ -79,7 +79,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             uowMock.Verify(u => u.CommitAsync(), Times.Once);
             uowMock.Verify(u => u.RollbackAsync(), Times.Never);
 
-            authRepoMock.Verify(a => a.GetUserByEmail("email"), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByEmail(It.IsAny<string>()), Times.Once);
 
             passwordHasherMock.Verify(p => p.VerifyPassword("password", "hashedPassword"), Times.Once);
 
@@ -94,16 +94,16 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
+            var userRepoMock = new Mock<IUserRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<LoginUserUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
 
-            authRepoMock.Setup(u => u.GetUserByEmail("email")).ReturnsAsync((User?)null);
+            uowMock.Setup(u => u.Users.GetUserByEmail(It.IsAny<string>())).ReturnsAsync((User?)null);
 
             var sut = new LoginUserUseCase(
                 uowMock.Object,
@@ -127,7 +127,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
 
             uowMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
 
-            authRepoMock.Verify(a => a.GetUserByEmail("email"), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByEmail(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -136,18 +136,19 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
+            var userRepoMock = new Mock<IUserRepository>();
             var passwordHasherMock = new Mock<IPasswordHasher>();
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<LoginUserUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
+
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
 
-            authRepoMock.Setup(u => u.GetUserByEmail("email")).ThrowsAsync(new Exception("Database error"));
+            uowMock.Setup(u => u.Users.GetUserByEmail(It.IsAny<string>())).ThrowsAsync(new Exception("Database error"));
 
             var sut = new LoginUserUseCase(
                 uowMock.Object,
@@ -172,7 +173,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             uowMock.Verify(u => u.CommitAsync(), Times.Never);
             uowMock.Verify(u => u.RollbackAsync(), Times.Once);
 
-            authRepoMock.Verify(a => a.GetUserByEmail("email"), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByEmail(It.IsAny<string>()), Times.Once);
         }
     }
 }

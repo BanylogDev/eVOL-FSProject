@@ -38,8 +38,8 @@ namespace eVOL.Application.UseCases.UserCases
 
             try
             {
-                var existingName = await _uow.Auth.GetUserByName(dto.Name);
-                var existingEmail = await _uow.Auth.GetUserByEmail(dto.Email);
+                var existingName = await _uow.Users.GetUserByName(dto.Name);
+                var existingEmail = await _uow.Users.GetUserByEmail(dto.Email);
 
                 if (existingName != null || existingEmail != null)
                 {

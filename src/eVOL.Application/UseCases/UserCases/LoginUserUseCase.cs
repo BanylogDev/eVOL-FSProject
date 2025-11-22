@@ -47,7 +47,7 @@ namespace eVOL.Application.UseCases.UserCases
 
             try
             {
-                var user = await _uow.Auth.GetUserByEmail(dto.Email);
+                var user = await _uow.Users.GetUserByEmail(dto.Email);
 
                 if (user == null || !_passwordHasher.VerifyPassword(dto.Password, user.Password))
                 {

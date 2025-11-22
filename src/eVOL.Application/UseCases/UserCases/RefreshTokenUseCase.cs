@@ -47,7 +47,7 @@ namespace eVOL.Application.UseCases.UserCases
                 _logger.LogInformation("Retrieving user information from token");
 
                 var name = principal.Identity?.Name;
-                var user = await _uow.Auth.GetUserByName(name);
+                var user = await _uow.Users.GetUserByName(name);
 
                 if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 {

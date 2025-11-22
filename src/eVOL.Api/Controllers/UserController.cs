@@ -10,7 +10,7 @@ namespace eVOL.API.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    [Authorize(Roles = "User,Admin")]
+    //[Authorize(Roles = "User,Admin")]
     public class UserController : ControllerBase
     {
 

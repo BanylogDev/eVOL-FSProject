@@ -24,12 +24,13 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
+            var userRepoMock = new Mock<IUserRepository>();
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<RefreshTokenUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
+            uowMock.Setup(u => u.Users).Returns(userRepoMock.Object);
+
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);
@@ -42,7 +43,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
                 RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(1)
             };
 
-            authRepoMock.Setup(u => u.GetUserByName("username")).ReturnsAsync(fakeUser);
+            uowMock.Setup(u => u.Users.GetUserByName(It.IsAny<string>())).ReturnsAsync(fakeUser);
 
             jwtServiceMock.Setup(j => j.GetPrincipalFromExpiredToken("expiredAccessToken", It.IsAny<IConfiguration>()))
                 .Returns(new System.Security.Claims.ClaimsPrincipal(
@@ -74,7 +75,7 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             uowMock.Verify(u => u.CommitAsync(), Times.Once);
             uowMock.Verify(u => u.RollbackAsync(), Times.Never);
 
-            authRepoMock.Verify(a => a.GetUserByName("username"), Times.Once);
+            uowMock.Verify(u => u.Users.GetUserByName(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -83,12 +84,10 @@ namespace eVOL.ApplicationTests.UseCases.UserCases
             // Arrange
 
             var uowMock = new Mock<IMySqlUnitOfWork>();
-            var authRepoMock = new Mock<IAuthRepository>();
             var jwtServiceMock = new Mock<IJwtService>();
             var configMock = new Mock<IConfiguration>();
             var loggerMock = new Mock<ILogger<RefreshTokenUseCase>>();
 
-            uowMock.Setup(u => u.Auth).Returns(authRepoMock.Object);
             uowMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.CommitAsync()).Returns(Task.CompletedTask);
             uowMock.Setup(u => u.RollbackAsync()).Returns(Task.CompletedTask);

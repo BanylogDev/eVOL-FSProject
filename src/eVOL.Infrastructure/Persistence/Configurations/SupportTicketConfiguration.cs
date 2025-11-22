@@ -28,12 +28,12 @@ public sealed class SupportTicketConfiguration : IEntityTypeConfiguration<Suppor
 
         // Relationships
         builder.HasOne(t => t.OpenedBy)
-               .WithMany(u => u.SupportTickets)
+               .WithMany(u => u.OpenedTickets)
                .HasForeignKey(t => t.OpenedById)
                .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(t => t.ClaimedBy)
-               .WithMany(u => u.SupportTickets) 
+               .WithMany(u => u.ClaimedTickets) 
                .HasForeignKey(t => t.ClaimedById)
                .OnDelete(DeleteBehavior.Restrict);
 
