@@ -4,6 +4,7 @@ using eVOL.Application.UseCases.UCInterfaces.IChatGroupCases;
 using eVOL.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace eVOL.API.Controllers
 {

@@ -4,6 +4,7 @@ using eVOL.Application.ServicesInterfaces;
 using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Domain.RepositoriesInteraces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BankApi_Clean_Architecture.Controllers
 {

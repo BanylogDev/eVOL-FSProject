@@ -3,6 +3,7 @@ using eVOL.Application.UseCases.UCInterfaces.IUserCases;
 using eVOL.Application.UseCases.UserCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 

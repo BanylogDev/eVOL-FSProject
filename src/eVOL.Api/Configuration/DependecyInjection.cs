@@ -17,11 +17,14 @@ using eVOL.Infrastructure.Services;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using StackExchange.Redis;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace eVOL.API.Configuration
 {
@@ -200,6 +203,40 @@ namespace eVOL.API.Configuration
             services.AddScoped<IMongoUnitOfWork, MongoUnitOfWork>();
 
 
+
+            return services;
+        }
+
+        public static IServiceCollection AddRateLimiterService(this IServiceCollection services)
+        {
+            services.AddRateLimiter(o =>
+            {
+
+                o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                o.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                {
+                    var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                             ?? context.Connection.RemoteIpAddress?.ToString()
+                             ?? "unknown";
+
+                    if (!string.IsNullOrEmpty(ip) && ip.Contains(','))
+                    {
+                        ip = ip.Split(',')[0].Trim();
+                    }
+
+
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: ip,
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 60,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        });
+                });
+            });
 
             return services;
         }

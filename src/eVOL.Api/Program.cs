@@ -26,7 +26,8 @@ builder.Services
     .AddAuthenticationAndAuthorization(builder.Configuration)
     .AddCorsService()
     .AddMapper()
-    .AddScopedUseCases();
+    .AddScopedUseCases()
+    .AddRateLimiterService();
 
 var app = builder.Build();
 
@@ -34,6 +35,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseCors("CorsPolicy");
 

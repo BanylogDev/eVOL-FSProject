@@ -2,6 +2,7 @@
 using eVOL.Application.UseCases.UCInterfaces.IAdminCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace eVOL.API.Controllers
 {
